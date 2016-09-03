@@ -14,8 +14,10 @@
 # Per-page layout changes:
 #
 # With no layout
-# page "/path/to/file.html", :layout => false
-#
+page '/*.xml', layout: false
+page '/*.json', layout: false
+page '/*.txt', layout: false
+
 # With alternative layout
 # page "/path/to/file.html", :layout => :otherlayout
 #
@@ -24,21 +26,11 @@
 #   page "/admin/*"
 # end
 
-# Proxy pages (https://middlemanapp.com/advanced/dynamic_pages/)
-# proxy "/this-page-has-no-template.html", "/template-file.html", :locals => {
-#  :which_fake_page => "Rendering a fake page with a local variable" }
-
 ###
 # Helpers
 ###
-
-# Automatic image dimensions on image_tag helper
-# activate :automatic_image_sizes
-
-# Reload the browser automatically whenever files change
-# configure :development do
-#   activate :livereload
-# end
+require "lib/helpers/date_helpers"
+helpers DateHelpers
 
 # Methods defined in the helpers block are available in templates
 # helpers do
@@ -47,28 +39,57 @@
 #   end
 # end
 
+###
+# Blogging
+###
+
+activate :blog do |blog|
+  blog.permalink = "{year}/{month}/{title}.html"
+  blog.tag_template = "tag.html"
+  blog.calendar_template = "calendar.html"
+  blog.sources = "blog/{year}-{month}-{day}-{title}.html"
+end
+
+###
+# Search
+###
+
+activate :search do |search|
+  search.resources = ['blog/']
+  search.fields = {
+    title:   {boost: 100, store: true, required: true},
+    content: {boost: 50},
+    url:     {index: false, store: true},
+    author:  {boost: 30}
+  }
+end
+
 set :css_dir, 'stylesheets'
-
 set :js_dir, 'javascripts'
-
 set :images_dir, 'images'
+set :fonts_dir,  'fonts'
 
+activate :sprockets
+
+# Reload the browser automatically whenever files change
+configure :development do
+  activate :livereload
+end
 # Build-specific configuration
 configure :build do
   set :build_dir, 'public'
-  set :base_url, "/middleman" # baseurl for GitLab Pages (project name) - leave empty if you're building a user/group website
+  set :base_url, "" # baseurl for GitLab Pages (project name) - leave empty if you're building a user/group website
   activate :relative_assets # Use relative URLs
   # For example, change the Compass output style for deployment
-  # activate :minify_css
+  activate :minify_css
 
   # Minify Javascript on build
-  # activate :minify_javascript
+  activate :minify_javascript
 
   # Enable cache buster
-  # activate :asset_hash
-
-  # Use relative URLs
-  # activate :relative_assets
+  # activate :asset_hash do |asset_hash|
+  #   asset_hash.exts << '.json'
+  # end
 
   # Or use a different image path
   # set :http_prefix, "/Content/images/"

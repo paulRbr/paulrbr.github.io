@@ -3,12 +3,17 @@
 source 'https://rubygems.org'
 
 gem "middleman"
-
+# Bring back sprockets to Middleman
+gem 'middleman-sprockets', '~> 4.0.0.rc.1'
+# Blogging extension
+gem "middleman-blog"
+gem "builder"  # For Atom xml feed
+gem "nokogiri" # For xml/html processing
+# Client side search
+gem 'middleman-search'
 # Live-reloading plugin
-gem "middleman-livereload", "~> 3.1.0"
+gem "middleman-livereload"
+# Font-awesome style
+gem 'font-awesome-middleman'
 
-# For faster file watcher updates on Windows:
-gem "wdm", "~> 0.1.0", :platforms => [:mswin, :mingw]
-
-# Windows does not come with time zone data
-gem "tzinfo-data", platforms: [:mswin, :mingw, :jruby]
+gem "pry", group: :development
