@@ -8,11 +8,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
     <!-- Use title if it's in the page YAML frontmatter -->
-    <title><%= current_page.data.title || "Hello 👋" %></title>
+    <title><%= current_page.data.title || "Hello!" %></title>
     <%= feed_tag :atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed" %>
 
-    <%= stylesheet_link_tag "normalize", "all" %>
-    <%= javascript_include_tag  "all" %>
+    <%= stylesheet_link_tag "all" %>
+    <%= javascript_include_tag "all", "search" %>
   </head>
 
   <body class="<%= page_classes %>">
