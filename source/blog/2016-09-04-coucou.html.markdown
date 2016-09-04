@@ -1,6 +1,6 @@
 ---
 title: coucou
-date: 2016-09-04 00:40 UTC
+date: 2016-09-04
 tags:
 ---
 

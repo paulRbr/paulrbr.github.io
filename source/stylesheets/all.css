@@ -167,7 +167,7 @@ div#search .fa-search {
 /* Common style for pseudo-elements */
 .article-excerpt {
   position: relative;
-  padding-bottom: 50px;
+  padding-bottom: 80px;
 }
 .ss::before,
 .ss::after {
@@ -176,9 +176,9 @@ div#search .fa-search {
   pointer-events: none; }
 
 .style-dots::before {
-  bottom: 25px;
-  width: 8px;
-  height: 8px;
+  bottom: 45px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   left: 50%;
   -webkit-transform: translateX(-50%);
