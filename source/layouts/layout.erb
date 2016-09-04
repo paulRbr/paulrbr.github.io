@@ -1,55 +1,12 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="description" content="Paul Bonaud, software engineer, automation lover and production addict">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Always force latest IE rendering engine or request Chrome Frame -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-
-    <!-- Use title if it's in the page YAML frontmatter -->
-    <title><%= current_page.data.title || "Hello!" %></title>
-    <%= feed_tag :atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed" %>
-
-    <%= stylesheet_link_tag "all" %>
-    <%= javascript_include_tag "all", "search" %>
-  </head>
+  <%= partial :head %>
 
   <body class="<%= page_classes %>">
+    <%= partial :sidebar %>
+
     <div id="main" role="main">
       <%= yield %>
     </div>
-
-    <aside>
-      <div class="welcome">
-        <div class="logo rounded-circle">
-          <a href="/"></a>
-        </div>
-        <h1><a href="/">Paul Bonaud</a></h1>
-        <div class="summary">
-          Passionate about code, challenges and automated systems
-        </div>
-      </div><!-- .welcome -->
-
-      <div id="menu">
-        <ul>
-          <li><a>Surprise</a></li>
-          <li><a>About</a></li>
-          <li><a>CV</a></li>
-        </ul>
-      </div>
-
-      <div id="search">
-        <form action="/search.html" method="get">
-          <label for="search_box">Search</label>
-          <input type="text" id="search_box" name="query" placeholder="Search">
-          <input type="submit" value="">
-          <i class="fa fa-search"></i>
-        </form>
-      </div>
-
-      <h2>Tags</h2>
-        <%= blog.tags.map { |t, _| link_to t, tag_path(t) }.join(", ") %>
-    </aside>
   </body>
 </html>
