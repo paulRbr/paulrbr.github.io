@@ -12,9 +12,16 @@ title: Hello! I'm Paul!
 <% end %>
 
 <% page_articles.each_with_index do |article, i| %>
-  <h2><%= link_to article.title, article %> </h2>
-  <div class="date"><%= human_date(article.date) %></div>
-  <%= article.summary(250) %>
+  <div class="article-excerpt">
+    <div class="ss style-dots">
+      <div class="date"><%= human_date(article.date) %></div>
+      <h2><%= link_to article.title, article %> </h2>
+      <%= article.body.split("\n\n").first(2).join("\n\n") %>
+      <% if article.body.split("\n").count > 2 %>
+        <%= link_to "- read more -", article %>
+      <% end %>
+    </div>
+  </div>
 <% end %>
 
 <% if paginate %>

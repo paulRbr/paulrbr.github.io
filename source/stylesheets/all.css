@@ -17,17 +17,24 @@ h1 {
   margin: 0; }
 
 div#main {
+  text-align: left;
   margin-right: 25%;
-  padding: 20px; }
+  padding: 20px;
+  max-width: 48em; }
 
 aside {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 23%;
-  height: 100%;
-  padding: 0 10px;
-  background-color: rgba(255, 255, 255, .2); }
+  position: relative;
+  margin-top: 0px;
+  width: 100%;
+  height: inherit;
+  padding: 8px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, .2);
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box; }
 
 a {
   color: rgba(0, 0, 0, .7);
@@ -46,25 +53,32 @@ a:hover {
 a:active {
   color: rgba(0, 0, 0, .8); }
 
+div.date {
+  text-align: left;
+  text-transform: uppercase;
+  font-size: 80%;
+  font-weight: bold;
+  color: rgba(0, 0, 0, .6); }
+
 div#menu {
   margin: 20px auto; }
 
-div#menu ul {
+div#menu li:not(:last-child):after {
+    content:' ⋅'; }
+
+ul.flat-ul {
   color: rgba(0, 0, 0, .7);
   list-style-type: none;
   display: inline-block;
   margin: 0 auto;
   padding: 0 }
 
-div#menu li {
+ul.flat-ul li {
   float: left;
   font-weight: bold;
   font-size: 16px;
   padding: 0 8px 0 0; }
 
-div#menu li:not(:last-child):after {
-    content:' ⋅';
-}
 
 div#search {
   width: 60%;
@@ -121,14 +135,17 @@ div#search .fa-search {
   cursor: pointer; }
 
 .rounded-circle {
-  border-radius: 100px !important; }
+  border-radius: 50% !important; }
+
+.rounded-5 {
+  border: 6px solid rgba(0, 0, 0, .2);
+  border-radius: 5% !important; }
 
 .welcome .logo {
+  display: none;
   background-image: url('https://avatars0.githubusercontent.com/u/904193?v=3&s=460');
   background-size: contain;
-  width: 128px;
-  height: 128px;
-  margin: 15px auto; }
+  margin: 10px auto; }
 
 .welcome .logo a {
   display: block;
@@ -137,31 +154,87 @@ div#search .fa-search {
 
 .welcome .summary {
   margin: 10px auto 20px;
-  width: 60%;
+  width: 70%;
   font-family: serif;
   font-style: italic;
   font-size: 12px;
   color: rgba(0, 0, 0, .5); }
 
-.welcome {
-  /* -webkit-animation-name: welcome; */
-  -webkit-animation-duration: .9s; }
+.big-screen {
+  display: none }
 
-@-webkit-keyframes welcome {
-  from {
-    -webkit-transform: scale(0);
-    opacity: 0;
-  }
-  50% {
-   -webkit-transform: scale(0);
-   opacity: 0;
-  }
-  82.5% {
-    -webkit-transform: scale(1.03);
-    -webkit-animation-timing-function: ease-out;
-    opacity: 1;
-  }
-  to {
-    -webkit-transform: scale(1);
-  }
+
+/* Common style for pseudo-elements */
+.article-excerpt {
+  position: relative;
+  padding-bottom: 50px;
+}
+.ss::before,
+.ss::after {
+  position: absolute;
+  content: '';
+  pointer-events: none; }
+
+.style-dots::before {
+  bottom: 25px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, .5);
+  box-shadow: 25px 0 rgba(0, 0, 0, .5), -25px 0 rgba(0, 0, 0, .5); }
+
+/* Double Line */
+.style-doubleline::before {
+  bottom: 0px;
+  width: 140px;
+  height: 2px;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, .5); }
+
+.style-doublediagonal {
+  z-index: 1;
+  padding-top: 6em;
+  background: rgba(0, 0, 0, .5); }
+
+.style-doublediagonal:before,
+.style-doublediagonal:after {
+  top: 0;
+  left: -25%;
+  z-index: -1;
+  width: 200%;
+  height: 5%;
+  background: inherit;
+  -webkit-transform: rotate(-2deg);
+  transform: rotate(-2deg);
+  -webkit-transform-origin: 0 0;
+  transform-origin: 0 0; }
+
+.style-doublediagonal::before {
+  height: 5%;
+  background: rgba(0, 0, 0, .5);
+  -webkit-transform: rotate(-3deg);
+  transform: rotate(-3deg);
+  -webkit-transform-origin: 3% 0;
+  transform-origin: 3% 0; }
+
+@media screen and (min-width: 1024px) {
+aside {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 23%;
+  height: 100%; }
+
+.welcome .logo {
+  display: block;
+  width: 128px;
+  height: 128px; }
+
+.big-screen {
+  display: block; }
 }

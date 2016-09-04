@@ -1,0 +1,43 @@
+<aside>
+  <div class="welcome">
+    <div class="logo rounded-circle">
+      <a href="/"></a>
+    </div>
+    <h1><a href="/">Paul Bonaud</a></h1>
+    <div class="summary">
+      Passionate about code, challenges and automated systems
+    </div>
+  </div><!-- .welcome -->
+
+  <div id="menu">
+    <ul class="flat-ul">
+      <li><a>Surprise</a></li>
+      <li><a>About</a></li>
+      <li><a href="/cv.pdf">CV</a></li>
+    </ul>
+  </div>
+
+  <div id="search" class="big-screen">
+    <form action="/search.html" method="get">
+      <label for="search_box">Search</label>
+      <input type="text" id="search_box" name="query" placeholder="Search">
+      <input type="submit" value="">
+      <i class="fa fa-search"></i>
+    </form>
+  </div>
+
+  <% if blog.tags.count > 0 %>
+  <h2>Tags</h2>
+  <%= blog.tags.map { |t, _| link_to t, tag_path(t) }.join(", ") %>
+  <% end %>
+
+  <div class="row big-screen">
+    <h2>Find me on</h2>
+    <ul class="flat-ul">
+      <li><a alt="Github" href="https://github.com/paulrbr"><img src="<%= image_path('github.png') %>" class="icon"/></a></li>
+      <li><a alt="Twitter" href="https://twitter.com/paulrb_r"> <img src="<%= image_path('twitter.png') %>" class="icon"/></a></li>
+      <li><a alt="PGP" href="https://pgp.mit.edu/pks/lookup?search=paul+bonaud&op=index"><img src="<%= image_path('mail.png') %>" class="icon"/></a></li>
+      <li><a alt="docker" href="https://hub.docker.com/u/swcc/"><img src="<%= image_path('docker.png') %>" class="icon"/></a></li>
+    </ul>
+  </div>
+</aside>

@@ -6,7 +6,13 @@
     <%= partial :sidebar %>
 
     <div id="main" role="main">
+      <div class="date"><%= human_date(current_page.data.date) %></div>
+      <h1><%= current_page.data.title %></h1>
+
       <%= yield %>
     </div>
+
+    <%= disqus %>
+    <%= disqus_count %>
   </body>
 </html>

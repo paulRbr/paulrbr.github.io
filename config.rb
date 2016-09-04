@@ -48,6 +48,7 @@ activate :blog do |blog|
   blog.tag_template = "tag.html"
   blog.calendar_template = "calendar.html"
   blog.sources = "blog/{year}-{month}-{day}-{title}.html"
+  blog.layout = "article"
 end
 
 ###
@@ -74,6 +75,9 @@ activate :sprockets
 # Reload the browser automatically whenever files change
 configure :development do
   activate :livereload
+  activate :disqus do |d|
+    d.shortname = nil # Dont use production shortname in dev
+  end
 end
 # Build-specific configuration
 configure :build do
@@ -84,7 +88,12 @@ configure :build do
   activate :minify_css
 
   # Minify Javascript on build
-#  activate :minify_javascript
+  activate :minify_javascript
+
+  activate :disqus do |d|
+    # using a different shortname for production builds
+    d.shortname = "paul-bonaud-fr"
+  end
 
   # Enable cache buster
   # activate :asset_hash do |asset_hash|

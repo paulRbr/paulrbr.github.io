@@ -15,5 +15,7 @@ gem 'middleman-search'
 gem "middleman-livereload"
 # Font-awesome style
 gem 'font-awesome-middleman'
+# Disqus comments
+gem "middleman-disqus"
 
 gem "pry", group: :development
