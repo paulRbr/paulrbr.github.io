@@ -5,12 +5,17 @@
   <body class="<%= page_classes %>">
     <%= partial :sidebar %>
 
-    <div id="main" role="main">
+    <article id="main" role="main">
       <div class="date"><%= human_date(current_page.data.date) %></div>
       <h1><%= current_page.data.title %></h1>
+      <div class="tags subtitle">
+        <% if current_page.tags.count > 0 %>
+          <%= current_page.tags.map { |t, _| link_to t, tag_path(t) }.join(", ") %>
+        <% end %>
+      </div>
 
       <%= yield %>
-    </div>
+    </article>
 
     <%= disqus %>
     <%= disqus_count %>

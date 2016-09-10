@@ -16,9 +16,14 @@ title: Welcome!
     <div class="ss style-dots">
       <div class="date"><%= human_date(article.date) %></div>
       <h2><%= link_to article.title, article %> </h2>
+      <div class="tags subtitle">
+        <% if article.tags.count > 0 %>
+          <%= article.tags.map { |t, _| link_to t, tag_path(t) }.join(", ") %>
+        <% end %>
+      </div>
       <%= article.body.split("\n\n").first(2).join("\n\n") %>
       <% if article.body.split("\n").count > 2 %>
-        <%= link_to "- read more -", article %>
+        <p><%= link_to "read more", article %></p>
       <% end %>
     </div>
   </div>

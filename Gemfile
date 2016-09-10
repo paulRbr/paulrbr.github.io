@@ -17,5 +17,7 @@ gem "middleman-livereload"
 gem 'font-awesome-middleman'
 # Disqus comments
 gem "middleman-disqus"
+# Color syntax
+gem "middleman-syntax"
 
 gem "pry", group: :development

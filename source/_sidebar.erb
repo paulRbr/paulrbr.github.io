@@ -4,7 +4,7 @@
       <a href="/"></a>
     </div>
     <h1><a href="/">Paul Bonaud</a></h1>
-    <div class="summary">
+    <div class="summary subtitle">
       Passionate about code, challenges and automated systems
     </div>
   </div><!-- .welcome -->
@@ -17,19 +17,14 @@
     </ul>
   </div>
 
-  <div id="search" class="big-screen">
-    <form action="/search.html" method="get">
-      <label for="search_box">Search</label>
-      <input type="text" id="search_box" name="query" placeholder="Search">
-      <input type="submit" value="">
-      <i class="fa fa-search"></i>
-    </form>
-  </div>
-
-  <% if blog.tags.count > 0 %>
-  <h2>Tags</h2>
-  <%= blog.tags.map { |t, _| link_to t, tag_path(t) }.join(", ") %>
-  <% end %>
+  <!-- <div id="search"> -->
+  <!--   <form action="/search.html" method="get"> -->
+  <!--     <label for="search_box">Search</label> -->
+  <!--     <input type="text" id="search_box" name="query" placeholder="Search..."> -->
+  <!--     <input type="submit" value=""> -->
+  <!--     <i class="fa fa-search"></i> -->
+  <!--   </form> -->
+  <!-- </div> -->
 
   <div class="row big-screen">
     <h2>Find me on</h2>
