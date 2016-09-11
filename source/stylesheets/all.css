@@ -56,7 +56,7 @@ div#main, article {
   width: 100%;
   font-size: 0.95em; }
 
-article h1, article h2, article h3, article h4, article h5, article h6, article p, article ol, article ul, article table, article blockquote, article div, article pre code, disqus_thread {
+article h1, article h2, article h3, article h4, article h5, article h6, article p, article ol, article ul, article table, article blockquote, article div, article pre code, #disqus_thread {
   max-width: 670px;
   margin: 10px auto; }
 
@@ -266,6 +266,11 @@ a.button:active {
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
   background: rgba(18, 43, 59, .5); }
+
+@media screen and (max-width: 710px) {
+article h1, article h2, article h3, article h4, article h5, article h6, article p, article ol, article ul, article table, article blockquote, article div, article pre code, #disqus_thread {
+    padding: 0px 20px; }
+}
 
 @media screen and (min-width: 1024px) {
 aside {
