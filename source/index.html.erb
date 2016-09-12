@@ -1,16 +1,8 @@
 ---
 pageable: true
 per_page: 10
-title: Welcome!
+title: Hello, I am Paul Bonaud, welcome!
 ---
-<% if paginate && num_pages > 1 %>
-  <p>Page <%= page_number %> of <%= num_pages %></p>
-
-  <% if prev_page %>
-    <p><%= link_to 'Previous page', prev_page %></p>
-  <% end %>
-<% end %>
-
 <% page_articles.each_with_index do |article, i| %>
   <div class="article-excerpt">
     <div class="ss style-dots">
@@ -29,8 +21,15 @@ title: Welcome!
   </div>
 <% end %>
 
-<% if paginate %>
-  <% if next_page %>
-    <p><%= link_to 'Next page', next_page %></p>
-  <% end %>
+<% if prev_page || next_page %>
+  <div class="pagination">
+
+    <p class="left"><% if prev_page %><%= link_to 'Previous page', prev_page %><% end %></p>
+
+    <p class="center">Page <%= page_number %> of <%= num_pages %></p>
+
+
+    <p class="right"><% if next_page %><%= link_to 'Next page', next_page %><% end %></p>
+
+  </div>
 <% end %>
