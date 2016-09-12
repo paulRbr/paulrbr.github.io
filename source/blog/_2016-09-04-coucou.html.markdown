@@ -1,5 +1,6 @@
 ---
 title: Coucou Ruby
+description: this is a post with a Lorem
 date: 2016-09-04
 tags: keyword, example, bonjour, ruby
 ---

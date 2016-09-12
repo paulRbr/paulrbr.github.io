@@ -43,12 +43,13 @@ helpers DateHelpers
 # Blogging
 ###
 
-activate :blog do |blog|
-  blog.permalink = "{year}/{month}/{title}.html"
-  blog.tag_template = "tag.html"
-  blog.calendar_template = "calendar.html"
-  blog.sources = "blog/{year}-{month}-{day}-{title}.html"
-  blog.layout = "article"
+activate :blog do |b|
+  b.permalink = "{year}/{month}/{title}.html"
+  b.tag_template = "tag.html"
+  b.calendar_template = "calendar.html"
+  b.sources = "blog/{year}-{month}-{day}-{title}.html"
+  b.layout = "article"
+  b.paginate = true
 end
 
 ###

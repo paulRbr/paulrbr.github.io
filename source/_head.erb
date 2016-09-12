@@ -1,12 +1,12 @@
 <head>
   <meta charset="utf-8" />
-  <meta name="description" content="Paul Bonaud, software engineer, automation lover and production addict">
+  <meta name="description" content="<%= current_page.data.description || 'Paul Bonaud, software engineer, automation lover and production reliability addict' %>">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Always force latest IE rendering engine or request Chrome Frame -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   <!-- Use title if it's in the page YAML frontmatter -->
-  <title><%= "#{current_page.data.title} - Paul Bonaud" %></title>
+  <title><%= current_page.data.title || "Paul Bonaud" %></title>
   <%= feed_tag :atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed" %>
 
   <%= stylesheet_link_tag "all", "color-syntax" %>
