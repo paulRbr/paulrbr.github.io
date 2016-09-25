@@ -71,7 +71,6 @@ set :js_dir, 'javascripts'
 set :images_dir, 'images'
 set :fonts_dir,  'fonts'
 
-
 set :markdown_engine, :kramdown
 activate :syntax #, line_numbers: true
 
@@ -88,6 +87,7 @@ end
 configure :build do
   set :build_dir, 'public'
   set :base_url, "" # baseurl for GitLab Pages (project name) - leave empty if you're building a user/group website
+  set :site_url, 'http://paul.bonaud.fr'
   activate :relative_assets # Use relative URLs
   # For example, change the Compass output style for deployment
   activate :minify_css
