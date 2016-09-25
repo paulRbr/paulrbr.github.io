@@ -304,7 +304,7 @@ a.button:active {
 
 #footer {
   font-style: italic;
-  font-size: .95em }
+  font-size: .90em }
 
 @media screen and (max-width: 710px) {
 article h1, article h2, article h3, article h4, article h5, article h6, article p, article ol, article ul, article table, article blockquote, article div, article pre code, #disqus_thread {
