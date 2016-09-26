@@ -78,6 +78,8 @@ activate :sprockets
 
 # Reload the browser automatically whenever files change
 configure :development do
+  set :site_url, "http://127.0.0.1:4567"
+
   activate :livereload
   activate :disqus do |d|
     d.shortname = nil # Dont use production shortname in dev
