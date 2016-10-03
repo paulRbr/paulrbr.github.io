@@ -5,6 +5,6 @@ date: 2016-01-01
 
 There has been a little while I wanted to create this mini-blog. I guess the [panic monster](https://www.ted.com/talks/tim_urban_inside_the_mind_of_a_master_procrastinator?language=en) finally came to say hello. So here it is I am happy to launch this site today! \o/!
 
-You sghould expect some references here of my discoveries through my personal and professional IT projects. Mostly around software, automation, site reliability and distributed systems.
+You should expect some references here of my discoveries through my personal and professional IT projects. Mostly around software, automation, site reliability and distributed systems.
 
 Opinions here are my own and not related to any of the companies I work or have worked for.
