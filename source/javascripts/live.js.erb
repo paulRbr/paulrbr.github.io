@@ -1,0 +1,30 @@
+var socket = new WebSocket('<%= app.config[:websocket_url] %>');
+var keepAlive = null;
+
+// Sends a message to the server via sockets
+function sendMessageToServer(message) {
+  socket.send(message);
+}
+function sendPingToServer() {
+  sendMessageToServer("ping");
+}
+
+// Add a connect listener
+socket.onopen = function() {
+  console.log('Client has connected to the server!');
+  // Ping server every 30s
+  keepAlive = setInterval(sendPingToServer, 30000);
+};
+// Add a connect listener
+socket.onmessage = function(data) {
+  console.log('Received a message from the server!', data);
+};
+// Add a disconnect listener
+socket.onclose = function() {
+  console.log('The client has disconnected!');
+  clearInterval(keepAlive);
+};
+socket.onerror = function() {
+  console.log('The client has received an error!');
+  clearInterval(keepAlive);
+};

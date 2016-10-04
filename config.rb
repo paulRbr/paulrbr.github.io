@@ -79,6 +79,7 @@ activate :sprockets
 # Reload the browser automatically whenever files change
 configure :development do
   set :site_url, "http://127.0.0.1:4567"
+  set :websocket_url, "ws://127.0.0.1:9292/status"
 
   activate :livereload
   activate :disqus do |d|
@@ -90,6 +91,7 @@ configure :build do
   set :build_dir, 'public'
   set :base_url, "" # baseurl for GitLab Pages (project name) - leave empty if you're building a user/group website
   set :site_url, 'http://paul.bonaud.fr'
+  set :websocket_url, "ws://paul.bonaud.fr:8000/status"
   activate :relative_assets # Use relative URLs
   # For example, change the Compass output style for deployment
   activate :minify_css
