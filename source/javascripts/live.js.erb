@@ -1,30 +1,198 @@
-var socket = new WebSocket('<%= app.config[:websocket_url] %>');
-var keepAlive = null;
+$(document).ready(function(){
+  var socket = new WebSocket('<%= app.config[:websocket_url] %>');
+  var keepAlive = null;
 
-// Sends a message to the server via sockets
-function sendMessageToServer(message) {
-  socket.send(message);
-}
-function sendPingToServer() {
-  sendMessageToServer("ping");
-}
+  // Sends a message to the server via sockets
+  function sendMessageToServer(message) {
+    socket.send(message);
+  }
+  function sendPingToServer() {
+    sendMessageToServer("ping");
+  }
 
-// Add a connect listener
-socket.onopen = function() {
-  console.log('Client has connected to the server!');
-  // Ping server every 30s
-  keepAlive = setInterval(sendPingToServer, 30000);
-};
-// Add a connect listener
-socket.onmessage = function(data) {
-  console.log('Received a message from the server!', data);
-};
-// Add a disconnect listener
-socket.onclose = function() {
-  console.log('The client has disconnected!');
-  clearInterval(keepAlive);
-};
-socket.onerror = function() {
-  console.log('The client has received an error!');
-  clearInterval(keepAlive);
-};
+  // Add a connect listener
+  socket.onopen = function() {
+    console.log('Client has connected to the server!');
+    // Ping server every 30s
+    keepAlive = setInterval(sendPingToServer, 30000);
+  };
+  // Add a connect listener
+  socket.onmessage = function(data) {
+    console.log('Received a message from the server!', data);
+
+    var payload = null;
+
+    try {
+      payload = JSON.parse(date);
+    } catch(e) {
+      console.warn("Error while parsing ws message: ", e);
+    }
+
+    if (payload['object_kind'] === "build") {
+      if (payload['build_status'] === "success") {
+        stopLoader();
+      } else {
+        startLoader();
+      }
+    }
+  };
+  // Add a disconnect listener
+  socket.onclose = function() {
+    console.log('The client has disconnected!');
+    clearInterval(keepAlive);
+  };
+  socket.onerror = function() {
+    console.log('The client has received an error!');
+    clearInterval(keepAlive);
+  };
+
+  var locked=false;
+  var $sendPlaceholder=$(".send-placeholder")
+  ,$send=$(".send")
+  ,$sendButton=$(".send-button")
+  ,$sentIcon=$(".sent-icon")
+  ,$sentBg=$(".sent-bg")
+  ,$indicatorDots=$(".send-button,.send-indicator-dot");
+  function setFilter(filter){
+    $(".send").css({
+      webkitFilter:filter,
+      mozFilter:filter,
+      filter:filter,
+    });
+  }
+  function setGoo(){
+    // setFilter("url(#goo)");
+  }
+  function setGooNoComp(){
+    // setFilter("url(#goo-no-comp)");
+  }
+
+  function startLoader(){
+    if(locked) return;
+
+    locked=true;
+
+    TweenMax.to($send,0.7,{
+      opacity:1,
+      display: "inline-block"
+    });
+    TweenMax.to($sendPlaceholder,0,{
+      opacity:0,
+      display: "none"
+    });
+    TweenMax.to($sendButton,0.6,{
+      scale:0.5,
+      ease:Back.easeOut
+    });
+
+    $indicatorDots.each(function(i){
+      startCircleAnim($(this),12,0.1,1+(i*0.2),1.1+(i*0.3));
+    });
+
+
+    // setTimeout(stopLoader, 3000+(Math.random()*3000));
+  }
+
+  function stopLoader(){
+    // success anim start
+    // close circle
+    $indicatorDots.each(function(i){
+      stopCircleAnim($(this),0.8+(i*0.1));
+    });
+    TweenMax.to($sentBg,0.7,{
+      delay:.7,
+      opacity:1
+    });
+
+    // show icon
+    setTimeout(function(){
+      setGoo();
+
+      TweenMax.fromTo($sentIcon,1.5,{
+	display:"inline-block",
+	opacity:0,
+	scale:0.1
+      },{
+	scale:1,
+	ease:Elastic.easeOut
+      });
+      TweenMax.to($sentIcon,0.5,{
+	delay:0,
+	opacity:1
+      });
+      TweenMax.to($sendButton,0.3,{
+	scale:1,
+	ease:Back.easeOut
+      });
+
+      // back to normal
+      setTimeout(function(){
+	TweenMax.to($sentBg,0.4,{
+	  opacity:0
+	});
+	TweenMax.to($sentIcon,0.2,{
+	  opacity:0,
+	  onComplete:function(){
+	    locked=false;
+	    $sentIcon.css({
+	      display:"none"
+	    });
+	  }
+	});
+        TweenMax.to($sendPlaceholder,0.6,{
+          opacity: 1,
+          display: "inline-block"
+        });
+        TweenMax.to($send,0,{
+          opacity: 0,
+          display: "none"
+        });
+
+
+      },2000);
+
+    },1000);
+  }
+
+  function setupCircle($obj){
+    if(typeof($obj.data("circle"))=="undefined"){
+      $obj.data("circle",{radius:0,angle:0});
+
+      function updateCirclePos(){
+	var circle=$obj.data("circle");
+	TweenMax.set($obj,{
+	  x:Math.cos(circle.angle)*circle.radius,
+	  y:Math.sin(circle.angle)*circle.radius,
+	});
+	requestAnimationFrame(updateCirclePos);
+      }
+      updateCirclePos();
+    }
+  }
+
+  function startCircleAnim($obj,radius,delay,startDuration,loopDuration){
+    setupCircle($obj);
+    $obj.data("circle").radius=0;
+    $obj.data("circle").angle=0;
+    TweenMax.to($obj.data("circle"),startDuration,{
+      delay:delay,
+      radius:radius,
+      ease:Quad.easeInOut
+    });
+    TweenMax.to($obj.data("circle"),loopDuration,{
+      delay:delay,
+      angle:Math.PI*2,
+      ease:Linear.easeNone,
+      repeat:-1
+    });
+  }
+  function stopCircleAnim($obj,duration){
+    TweenMax.to($obj.data("circle"),duration,{
+      radius:0,
+      ease:Quad.easeInOut,
+      onComplete:function(){
+	TweenMax.killTweensOf($obj.data("circle"));
+      }
+    });
+  }
+});
