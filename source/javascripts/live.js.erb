@@ -17,13 +17,13 @@ $(document).ready(function(){
     keepAlive = setInterval(sendPingToServer, 30000);
   };
   // Add a connect listener
-  socket.onmessage = function(data) {
-    console.log('Received a message from the server!', data);
+  socket.onmessage = function(event) {
+    console.log('Received a message from the server!', event);
 
     var payload = null;
 
     try {
-      payload = JSON.parse(date);
+      payload = JSON.parse(event.data);
     } catch(e) {
       console.warn("Error while parsing ws message: ", e);
     }
