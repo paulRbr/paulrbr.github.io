@@ -20,7 +20,7 @@ $(document).ready(function(){
   socket.onmessage = function(event) {
     console.log('Received a message from the server!', event);
 
-    var payload = null;
+    var payload = {};
 
     try {
       payload = JSON.parse(event.data);
