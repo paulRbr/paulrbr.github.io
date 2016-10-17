@@ -61,14 +61,19 @@ div#main, article {
 
 article h1, article h2, article h3, article h4, article h5, article h6, article p, article ol, article ul, article table, article blockquote, article div, article pre code, #disqus_thread {
   max-width: 670px;
-  margin: 10px auto; }
+  margin: 20px auto; }
 
 article pre code {
   display: block;
   overflow-x: auto; }
 article .date {
   margin: 20px auto 10px; }
-article .subtitle {
+article :not(pre) code {
+  color: rgb(18, 43, 59);
+  background-color: rgba(18, 43, 59, .1);
+  padding: 1px 2px;
+}
+article .subtitle, article h1, article h2, article h3 {
   margin: 10px auto 20px; }
 
 aside {
