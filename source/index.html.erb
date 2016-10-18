@@ -13,7 +13,7 @@ title: Hello, I am Paul Bonaud, welcome!
           <%= article.tags.map { |t, _| link_to t, tag_path(t) }.join(", ") %>
         <% end %>
       </div>
-      <%= article.body.split("\n\n").first(2).join("\n\n") %>
+      <%= article.summary %>
       <% if article.body.split("\n").count > 2 %>
         <p><%= link_to "read more", article %></p>
       <% end %>
