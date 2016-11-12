@@ -20,6 +20,8 @@ your production infrastructure is designed to run containers.
 What if you still run dedicated instances or bare metal machines? Would
 you even want to use it?
 
+READMORE
+
 ## A realistic and proven use-case
 
 Imagine your stack is composed of different OS versions, with

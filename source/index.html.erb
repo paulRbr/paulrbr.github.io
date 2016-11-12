@@ -17,6 +17,9 @@ title: Hello, I am Paul Bonaud, welcome!
       <% if article.body.split("\n").count > 2 %>
         <p><%= link_to "read more", article %></p>
       <% end %>
+      <% (article.data[:skip_to_link] || {}).each do |anchor, text| %>
+        <p><%= link_to text, "#{article.url}\##{anchor}" %></p>
+      <% end %>
     </div>
   </div>
 <% end %>
