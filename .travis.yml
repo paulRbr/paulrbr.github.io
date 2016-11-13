@@ -1,0 +1,16 @@
+language: ruby
+install:
+  - bundle install --path vendor/bundle
+script:
+  - bundle exec middleman build --clean
+after_success:
+  - openssl aes-256-cbc -K $encrypted_cd32eca6684a_key -iv $encrypted_cd32eca6684a_iv -in deploy_key.pem.enc -out deploy_key.pem -d
+  - eval "$(ssh-agent -s)"
+  - chmod 600 deploy_key.pem
+  - ssh-add deploy_key.pem
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: scripts/deploy.sh
+  on:
+    branch: master
