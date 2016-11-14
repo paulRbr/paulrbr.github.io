@@ -5,7 +5,7 @@ tags: conference, velocity, Amsterdam, people
 skip_to_link: { talks: "Skip directly to the talks transcripts 📝" }
 ---
 
-I had the chance to attend [Velocity conf 2016](http://conferences.oreilly.com/velocity/devops-web-performance-eu){:target="_blank"} in Amsterdam thanks to my current employer [Trainline](https://www.trainline.eu/about/us){:target="_blank"} (ex Capitaine Train). This article is a minimal transcript of my journey there during the talk sessions.
+I had the chance to attend [Velocity conf 2016](http://conferences.oreilly.com/velocity/devops-web-performance-eu){:target="_blank"} in Amsterdam thanks to my current employer [Trainline](https://www.trainline.eu/about/us){:target="_blank"} (formerly Capitaine Train). This article is a minimal transcript of my journey there during the talk sessions.
 
 READMORE
 
