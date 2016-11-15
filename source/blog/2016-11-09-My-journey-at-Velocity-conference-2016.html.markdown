@@ -882,6 +882,8 @@ _Chef_
 
 [@lnxchk](https://twitter.com/lnxchk){:target="_blank"}
 
+[slides](http://cdn.oreillystatic.com/en/assets/1/event/167/Building%20security%20into%20your%20workflow%20with%20InSpec%20Presentation.zip)
+
 Building sec into your workflow w/InSpec
 
 * She's technical community manager for Chef
