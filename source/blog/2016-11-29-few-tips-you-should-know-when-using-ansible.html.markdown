@@ -169,7 +169,7 @@ run: ## Run a playbook
 	ansible-playbook $(opts) $(playbook).yml
 ~~~
 
-Feel free to check my complete current [Makefile](https://gitlab.com/paulrbr/ansible-owncloud-setup/blob/master/Makefile) settings for my ansible managed projects. It is probably not perfect but it is a good start. Do not hesitate to comment/contribute if you feel some things are missing.
+Feel free to check my complete current [Makefile](https://github.com/paulRbr/ansible-makefile/blob/master/Makefile) settings for my ansible managed projects. It is probably not perfect but it is a good start. Do not hesitate to comment/contribute if you feel some things are missing.
 
 It is now really easy to test one of my playbook and I don't need to remember to put the `--check` or `-C` flag each time:
 
