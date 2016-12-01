@@ -104,7 +104,7 @@ With this list of roles inside your playbook, you will now easily be able to iso
 
 `ansible-playbook --tags database setup.yml`
 
-You have noticed the condition on both the `nginx` and `postgresql`. Imagine you have a server `db01` which is not part of your `webserver` **group** inside your **inventory**. By mistake you try to apply the related `webserver` tasks to this server. The **group condition** will save you as you can see on the logs bellow (see the `skipping:` output):
+You have noticed the condition on both the `nginx` and `postgresql`. Imagine you have a server `db01` which is **not** part of your `webserver` **group** inside your **inventory**. By mistake you try to apply the related `webserver` tasks to this server. The **group condition** will save you as you can see on the logs bellow (see the `skipping:` output):
 
 ~~~ yaml
 # ~> ansible-playbook --limit db01 --tags webserver setup.yml
@@ -132,7 +132,7 @@ skipping: [db01]
 
 I will [again](paul.bonaud.fr/2016/09/Building-apps-with-docker.html#a-realistic-and-proven-use-case) thank my friend and ex-colleague [Pierre](https://twitter.com/pmorinerie) for his nice article about [standardizing projects with Makefiles](https://blog.trainline.eu/13439-standardizing-interfaces-across-projects-with-makefiles). If you have never read it you should take a look at it. It is really great when working with multiple projects.
 
-If we try to apply this philosophy to an ansible configuration project we can define a few tasks that we will do often:
+If we try to apply this philosophy to an ansible configuration project we can define a few tasks that we will often do:
 
 * install dependencies from a dependency file with `make install`
 
@@ -166,10 +166,10 @@ dry-run: ## Run a playbook in dry run mode
 
 ~~~ makefile
 run: ## Run a playbook
-	ansible-playbook $(opts) $(playbook).yml
+	ansible-playbook --diff $(opts) $(playbook).yml
 ~~~
 
-Feel free to check my complete current [Makefile](https://github.com/paulRbr/ansible-makefile/blob/master/Makefile) settings for my ansible managed projects. It is probably not perfect but it is a good start. Do not hesitate to comment/contribute if you feel some things are missing.
+Feel free to check my complete current [Makefile](https://github.com/paulRbr/ansible-makefile/blob/master/Makefile) settings for my ansible managed projects. It is probably not perfect but it is a good start. If you feel some things are missing, contributions are very welcome.
 
 It is now really easy to test one of my playbook and I don't need to remember to put the `--check` or `-C` flag each time:
 
@@ -191,22 +191,29 @@ Inside your infrastructure's configuration data you will probably not want to sa
 
 **I really recommend all of the following:**
 
-* Separate vault passphrase per environment
-* Prefix vaulted variables by `vault_` and use these within your none vaulted files. E.g.
+* **Separate vault passphrase per environment**: you really do not want your integration passphrase to decrypt your sensitive production data.
+* **Prefix vaulted variables** by `vault_` and use these within your non vaulted files. This is for clarity when reading the data variable files. Someone picking up your data file later on will clearly see that your variables has a vaulted value without the need to decrypt the vaulted file to understand that. E.g.
 
 ~~~ yaml
 # clear text vars.yml file
-myvar: "{{ vault_myvar }}"
+strong_password: "{{ vault_strong_password }}"
 ~~~
 
 ~~~ yaml
-# Encrypted vault_vars.yml file
-vault_myvar: "my_secret_content"
+# Encrypted content of the vault_vars.yml file
+#
+# vault_strong_password: "my_secret_content"
+#
+$ANSIBLE_VAULT;1.1;AES256
+326338613161366139376638
+376135313138646232336666
+643566303265393938643631
+53332623863383133862
 ~~~
 
-* As seen in the previous point: prefix vaulted filenames by `vault_`
-* Use a single entry point script to output the passphrase (pass.sh)
-* Use `no_log: true` for every task that interacts with a vaulted variable
+* As seen in the previous point: **prefix vaulted filenames** by `vault_` and associate them with the non vaulted counterpart file. `vars.yml` and `vault_vars.yml` for instance
+* Use a **single entry point script** to output the passphrase (pass.sh)
+* **Use `no_log: true`** for every task that interacts with a vaulted variable. This will ensure to not output any sentive information in your ansible logs.
 
 ## 6. Agent-less tool: you need a good and automated build pipeline
 
