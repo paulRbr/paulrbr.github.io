@@ -356,3 +356,6 @@ span.img-border {
 span.img-border img {
   width: 100%;
   height: 100%; }
+
+.legal {
+  font-size: 0.8em; }
