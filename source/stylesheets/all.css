@@ -76,6 +76,21 @@ article :not(pre) code {
 article .subtitle, article h1, article h2, article h3 {
   margin: 10px auto 20px; }
 
+article .anchor {
+  float: left;
+  padding-right: 4px;
+  margin-left: -20px;
+  display: none; }
+
+article .anchor i.fa {
+  width: 16px;
+  height: 16px;
+  font-size: 0.7em; }
+
+article h2:hover .anchor {
+  display: block;
+  text-decoration: none; }
+
 aside {
   color: rgb(255, 246, 228);
   position: relative;
