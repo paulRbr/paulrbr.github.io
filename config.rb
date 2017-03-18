@@ -27,9 +27,14 @@ page '/*.txt', layout: false
 # end
 
 ###
+# Renderers
+###
+require "lib/renderers.rb"
+
+###
 # Helpers
 ###
-require "lib/helpers/date_helpers"
+require "lib/helpers.rb"
 helpers DateHelpers
 
 # Methods defined in the helpers block are available in templates

@@ -25,11 +25,11 @@ Don't worry dynamic inventories are easy to manipulate in Ansible. Just add an e
 So as I said, I really advise you to **separate your different environments into different "inventory directory"**:
 
 ~~~ yaml
-integ/
-  hosts        # ← inventory file containing integration servers
-
-prod/
-  hosts        # ← inventory file containing production servers
+├── integ/
+│   └── hosts  # ← inventory file containing integration servers
+│
+├── prod/
+│   └── hosts  # ← inventory file containing production servers
 ~~~
 
 You will then be sure to never mix **integration** hosts into your **production** inventory. Also it will be easy for you to factorize some variables that are environment agnostic.
@@ -37,25 +37,25 @@ You will then be sure to never mix **integration** hosts into your **production*
 Imagine you have a `webserver` **group**. This _group_ notion has nothing _environment_ related: it is a group that exists for all of your environments. You will thus be able to store variables in your directory structure like this:
 
 ~~~ yaml
-integ/
-  host_vars/   # ← Host specific variables
-
-  group_vars/
-    webserver/
-      vars.yml # ← Integration env specific variables
-  hosts        # Integration inventory
-
-prod/
-  host_vars/   # ← Host specific variables
-
-  group_vars/
-    webserver/
-      vars.yml # ← Production env specific variables
-  hosts        # Production inventory
-
-group_vars/
-  webserver/
-    vars.yml   # ← Variables common to all envs
+├── integ/
+│   ├── host_vars/       # ← Host specific variables
+│   │
+│   ├── group_vars/
+│   │   └── webserver/
+│   │       └── vars.yml # ← Integration env specific variables
+│   └── hosts            # Integration inventory
+│
+├── prod/
+│   ├── host_vars/       # ← Host specific variables
+│   │
+│   ├── group_vars/
+│   │   └── webserver/
+│   │       └── vars.yml # ← Production env specific variables
+│   └── hosts            # Production inventory
+│
+├── group_vars/
+│   └── webserver/
+│       └── vars.yml     # ← Variables common to all envs
 ~~~
 
 The set of all those variables files will be your **infrastructure's configuration data**.
