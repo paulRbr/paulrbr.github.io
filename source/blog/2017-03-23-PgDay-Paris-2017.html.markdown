@@ -1,0 +1,943 @@
+---
+title: PgDay Paris 2017
+date: 2017-03-23
+tags: conference, pgday, Paris, postgresql
+skip_to_link: { talks: "Skip directly to the talks transcripts 📝" }
+---
+
+PostgreSQL is known to be a very good relational database system. Because it is robust, because it has all the features than modern SGBD databases systems expects. On top of that it is an open source and free software with a very wide community behind it. This community is filled with great people trying to make the postgreSQL ecosystem as good as possible.
+
+Today I had the chance to attend the [PgDay Paris 2017](http://www.pgday.paris/2017/schedule/){:target="_blank"} event and it was a very nice day. I tried to take some notes about the talks and wanted to share with you what I saw. Most of the talks have [slides available online](https://wiki.postgresql.org/wiki/PgDay_Paris_2017){:target="_blank"} but if you want more detail about what was said and what I captured during this event please follow the page bellow :){:target="_blank"}.
+
+## Small conference for better encounters
+
+This is a great [one day conference](http://www.pgday.paris/2017/schedule/){:target="_blank"}. It is usually a cheap event, with great speakers from the PostgreSQL community around the world and is held entirely in English. If you have the chance to attend you should come! This year's 2017 edition was my second [pgday.paris](http://www.pgday.paris/){:target="_blank"} and I was verry happy to be part as a spectator.
+
+Huge thanks to the Staff organising the event! [@shaysler](https://twitter.com/shaysler){:target="_blank"}, [@pg_krol](https://twitter.com/pg_krol){:target="_blank"}, [@pg_xocolatl](https://twitter.com/pg_xocolatl){:target="_blank"}, and Katharine Atwood.
+
+## Talks
+
+Morning
+
+* [Kaarel Moppel](#a-pg-dbas-toolbelt)
+* [Christphe Pettus](#corruption-war-stories)
+* [Sylvie Aune](#cant-imagine-what-a-newbie-can-do-with-pg-on-linux-in-a-month)
+* [Fabien Coelho](#measuring-and-reducing-postgres-transaction-latency)
+
+Afternoon
+
+* [Magnus Hagander](#a-look-at-the-elephants-trunk---pg-10)
+* [Steven Simpson](#infrastructure-monitoring)
+* [Joe Conway](#mls-postgres-and-selinux)
+* [Simon Riggs](#replication--recovery-in-pg-10)
+
+# A PG DBAs Toolbelt
+
+* Kaarel Moppel (Cybertec)
+
+## Setup
+
+* **PG documentation is great**. Always try to know the concepts behind the tools.
+* **PGtune**: outputs a pg.conf file from an existing one depending of your hardware. Good resources for that are also available on postgres' wiki at the [Performance Optimization](https://wiki.postgresql.org/wiki/Performance_Optimization) page and the [Category:Benchmarking](https://wiki.postgresql.org/wiki/Category:Benchmarking) one.
+* `pgbench`: Benchmark your PG installation. It measures throughput in **TPS**. Bundled into pgserver binary. Custom workloads + probabilities (of writes / reads).
+* pgbench-tools: wrapper around pgbench with nice graphs and summaries.
+* Backups!
+  * Wal-e (cloud oriented). Provide your cloud access keys directly they will do the rest.
+  * **PGbarman**. Incremental backup, WAL archiving...
+  * PGbackrest
+
+## Monitoring
+
+* Basics linux: top/**htop** and iotop/dstat.
+* **pg_activity**. Extra python binary. Top-like app for pg. Very useful to see blocking queries and quickly kill them.
+* **pg_view**. Extra binary. Activity view with very detailed info. Really nice.
+* pgcenter. Extra binary. Similar but **lots** of features. Top-like but also, config update, I/Os, etc
+* `pg_stat_statements` is a pg contrib extension with lots of metrics.
+
+## Monitoring frameworks
+
+* Any monitoring solutions usualy has a pg extension (new relic, zabbix, nagios, whatever...)
+* integrates with Nagios:
+  * `check_postgres` 
+  * `check_pgactivity`
+* **PgObserver**: remote data collector (stores in extra db) and has graphs tables views. No need for extensions on the server.
+* **pghero**: health checks. Suggested indexes.
+
+## Common data tools
+
+* Text snippets: from the [wiki.postgresql.org](https://wiki.postgresql.org/wiki/Main_Page) there are lots of query snippets to help you find duplicate rows, data dependencies, index problems...
+* **pgBadger**: log analyser. Produces html static pages: slowest queries, sessions, locking, tps, temp files, parallel...
+  * supports pgbouncer log files
+* Misc solutions:
+  * Cloud provider plugins: loggly, splunk
+  * redislog for ELK stack
+  * Push logs into extra Postgres tables! Then just query with PG :).
+
+## Indexing
+
+* **hypopg**: build "hypothetical" indexes to see if it will be usefull (after an `EXPLAIN`). Good to check if postgres will use the index before even building it.
+* **pghero**: index sugestions
+
+## Bloat
+
+* `pgstattuple` pg extension.
+* `check_pgactivity`
+* [**pg_repack**](https://github.com/reorg/pg_repack): extension. Used for years. It cleans bloated data in tables without locks. "better vacuum full"
+* **pg_squeeze**: similar than pg_repack but without triggers (with replication slots and logicial decoding).
+
+## Navigating
+
+* `psql` of course. Don't forget to check `.psqlrc` config file (for shortcuts, custom display improvements)
+* pgcli (python bin - slower than psql).
+* Graphical:
+  * pgadmin
+  * DataGrip (commercial product)
+  * SqlPad
+
+## Data integrations
+
+* Foreign Data Wrappers FTW.
+* **pgloader**: "1-click" MySQL migrations, or CSV
+* postgrest
+* **ngx_postgres**: nginx extension to interact with postgres
+
+## For developers
+
+* pgTap: unit testing for postgres
+* sqitch: migration management
+
+## Scaling
+
+* pgbouncer (connection pooling)
+* pgpool-II
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# Corruption War Stories
+
+* Christophe Pettus (PostgreSQL Experts, Inc)
+* [@xof](https://twitter.com/xof)
+
+## it will happen /o\
+
+* backup
+  * even good backup can have hidden long-term corruption
+  * can be too old
+  * or hit by a PG bug
+
+## Preventing corruption
+
+* how to fix? Don't have one in the first place.
+* PG assumes FS is perfect, but it's not:
+  * can not recover from silent bad data write
+  * with 9.3 checksums, you at least have warnings
+
+## Hardware is cheap. But data is expensive
+
+* Use good-quality hardware.
+* HW needs to honor fsync END TO END. (Manufactors do hide infos)
+* avoid network devices for `$PGDATA` and backups
+
+## Technic, Process
+
+* be sure to follow the right protocol
+* test this protocol.
+* test your backups. **Obviously**. backups are not backups if they are not tested.
+
+## Find corruptions
+
+* Try out a **pg_dump to /dev/null**. You'll be sure it will read every single row.
+* beware about I/Os of course
+* great for finding corrupt data
+
+## HW failures
+
+* bad disk, bad controller
+* garbage writes during power loss
+* bad ram (**non-ECC ram**)
+
+## HW features
+
+* deferred or missing fsync behavior. HW vendors lie...
+* network storage that does not handle detach gracefully.
+* soft-RAID edge conditions
+
+## PG bugs
+
+* 9.2 and 9.3 had unfortunate replication bugs.
+* 9.6.1 index bug
+
+## Operator error
+
+* forget external tablespaces
+* `rm -rf` wrong directory. (💚  for Gitlab)
+* Special 👏 👏 to Gitlab for **their transparency** and for the **gold-mine** info in [their postmortem](https://docs.google.com/document/d/1GCK53YDcBWQveod9kfzW-VCxIABGiryG7_z_6jHdVik/pub).
+
+## What to do?
+
+* Buy good hardware. Demand your HW provider what your disks are.
+
+## Basics
+
+* Save all parts:
+  * stop pg
+  * do a **full filesystem level beckup**.
+  * keep it safe
+  * document each step
+
+## Again: use pg_dump
+
+## Bad data page
+
+* checksum failures
+* can you pg_dump the table?
+
+## Really bad data pages
+
+* Can you SELECT those pages?
+
+## Desperate cures
+
+* all corruptions are by nature "one-off" situation.
+* No recipes to recover. You need to analyse.
+
+## WORK ON A COPY
+
+## Check system logs
+
+* mdadm, **dmesg**...
+* **oom killer** terminating backends?
+
+## WAL files corrupt or missing
+
+* disk space pb
+* remove "logs"
+* what?
+* you mean "pg_xlogs"
+* :facepalm:
+
+## pg_clog
+
+* pg status of transactions
+* pg_clog corruption is rarely subtle.
+* usualy a missing file
+* easy to patch: just add a zeros file. (00 means "in progress")
+
+## system catalog corruption
+
+* horrible. Nightmare
+* very hard to recover from
+
+## Real life corruptions stories
+
+### pg_clog corruption
+
+* network connectivity issue
+* secondary promoted
+* secondary not as powerful as primary. Couldn't handle the load
+* back to the primary
+* network issues again
+
+### upgrade
+
+* secondary promoting from primary
+* existing rows are missing
+* no errors
+* PG bug
+  * 9.3 bug
+  * clog values were not properly being transmitted from primary to secondary under HIGH-write-load conditions.
+
+#### the fix
+
+* enough info to delete the bad rows
+
+#### Moral
+
+* do **thorough sanity checks** on promoted primaries
+
+### Other moral
+
+* DON'T use desktop hardware
+* even old backups can be useful
+
+### Too many autovacuums going on
+
+* because of configuration (`autovacuum_freeze_max_age` very high)
+* wraparound warnings in the logs
+* **no monitoring**: didn't notice.
+* needed to manually vacuum oldest tables.
+
+#### Moral
+* don't crack up the autocavuum freeze conf
+* **MONTIOR errors and warnings**.
+
+## TL;DR
+
+* Good hardware.
+* **Test your backups**
+* Stay up to date on **release notes of PG** and apply upgrades promptly.
+* **MONITOR your log** output
+* Get plenty of rest
+
+## Q/A
+
+* Can we rely on FS checksums? I'd say yes but don't have arguments for specific filesystem.
+* tools to check fsync? pg_test_fsync included in PG can check fsync for you.
+* How to check backups? I use barman, backups + restore and pg_dump the restored database. Is it enough?
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# Can't imagine what a newbie can do with PG on Linux in a month
+
+* Sylvie Aune (teacher and working SA Infoconsulting)
+
+## IPrec
+
+* projects to help get trainings for newbies from very technical professionals.
+
+## Beginnings (our first test)
+
+* install and deploy FREE inventory management ool
+* present project after ONE month.
+
+* a project manager (with no time to help)
+* 4 newbies (with two very motivated by the challenge)
+* One IT trainer with good linux and db skills.
+
+## Good for newbies
+
+* easy enough to get 4 people that didn't know anything about PG to get starting
+
+## Newbies got something out of the training program
+
+* Know happy and continue to learn about it
+* Useful knownledge in their dayly jobs
+
+## TL;DR
+
+> It is Not Because Things are Difficult that We Do Not Dare; It Is Because We Do Not Dare that They are Difficult.
+>
+> ~Seneca~
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# Measuring and Reducing Postgres Transaction Latency
+
+* Fabien Coelho (Teacher at École des Mines de Paris)
+
+## OLTP - Online Transaction Processing
+
+* CRUD queries
+* data fit in shared buffers
+* RW RO
+* Focus on performance, with **emphasis on LATENCY** (not only TPS)
+
+## Typical 3-tier web app
+
+* User ↔ Client ↔ **App Server ↔  Database**
+* focused on last part (**app server ↔  db**)
+  * connection
+  * req-res cyckes
+
+## Transaction perf measures
+
+* troughput **(tx/sec)**
+* Latency. For one transaction how long did it take? **(ms/tx)**
+  * Both are **correlated** (and contradictory!). Better throughput usually leads to worst latency
+  * **max vs enough**. Think about a MAX latency you don't want to bypass before thinking about huge TPS.
+  * Bottleneck (network, cpu, ios, mem..) for throughput. For latency it depends on the **base transaction time**. If your transaction is 10 ms and you improve network connectivity by 1 ms you get a 20 % improvement. If the transac is 2ms you get a 100% improvement!
+
+## PG perf swiss army knife
+
+* input, options parallelism, output
+* **pgbench**
+* tests needs to be long enough (warmup, checkpoint, vacuums...)
+* **multiple times**. To be able to reproduce.
+
+## Connection costs
+
+* connection AAA **1/3rd** of the time
+* SSL handskae **1/3rd**
+* Transaction **1/3rd**
+
+→ of course avoid reconnections for each transaction.
+
+## Comparing 9.5 vs 9.6
+
+* `pgbench -j 4 -c 8`
+* 329.4 tps vs 326 tps
+* 24.3ms vs 24.4ms
+* latency std deviation: 79.5ms vs 20ms
+
+* Instant TPS has completly different behavior. Graphed each second.
+* 9.5 has lots of seconds where it has to wait (where ~0 tps).
+* 9.6 is smoother (but has overal lower tps)
+
+## Why?
+
+* 9.5 has checkpoints.
+  * data writes spread over time == **random I/O**
+  * OS chosses when to actually write (30s delay on linux)
+  * until... fsync is called == **I/O storm**
+
+Solutions?
+
+* very expensive hardware
+* use PG 9.6! \o/
+  * sorted data writes == **sequential I/O**
+  * flush instructions sent regularly (256kb) `checkpoint_flush_after`
+  * when fsync is called == **everything is already written**, great!
+
+## Rate vs Limit
+
+* in pgbench you have two options `-R` and `-L` for max rate and max limit.
+* 9.5
+  * slow & skipped 24%
+  * latency 15.6 ± 158ms
+
+* 9.6 with checkpoint
+  * slow & skipped 2.7%
+  * latency 3.6 ± 24ms
+
+* 9.6 with sorted data
+  * Even better!
+
+## Play with FILLFACTOR storage param
+
+* PG: UPDATE = DELETE + INSERT. This can actually happen on multiple different pages and **at worst up to 3 changes**.
+* doesn't change perf that much changing the fillfactor.
+
+## Hardware
+
+* Hard Disk Drive **HDD** vs **SSD**
+
+* mech vs elec
+* fast seq I/O for both
+* **slow random** I/O vs **fast random** I/O
+
+* 406 tps vs **4700 tps**
+* 19.7 ±12.3ms vs **1.7 ± 2.4ms**
+
+## UNLOGGED tables (mysql style - data at risk)
+
+* 10x perf imprivement
+* ⚠️️ ⚠️️  but **don't do it** you can loose data.
+
+## RO test (in-cache)
+
+* queries on 3 tables
+  * transfers (network)
+  * parse query (syntax analysis)
+  * plan query
+  * exec query
+
+* SSL cost. Time & €
+  * nego and re-nego
+  * crypto functions
+  * certificate
+  * Benefits: **CIA (Confidentiality, Integrity and Authentication)**
+  * **10% overhead with SSL on**
+
+
+* simple vs prepared statements
+  * temp one-cmd function
+  * factor out `parse` cost
+  * keep `plan`  and `execute`
+  * pgbench `-M prepared`
+  * 20% improvement with `prepared`. Good idea if things are repeated.
+
+## Query combination trick
+
+* Update, then SELECT. Can be replaced by `UPDATE ... RETURNING`
+  * No better perf.. :( sometimes it works.
+
+* combined queries (with `\;` `BEGIN; multiple SELECT \; COMMIT;`)
+  * **x2 perf**! on both tps and latency
+
+* FUNCTIONs
+  * **x2 perf** (roughly same as combined queries)
+
+* PL/pgSQL
+  * **x3 perf**!!!
+  * why?
+  * with PL/pgSQL the **planning time is cached**. and done only once at first function call!
+
+## Client-server distance
+
+* LAN local network
+* LO loopback
+* IPC inter-process coms
+
+* 400 vs 1133 vs 1243 tps
+* 2.4 vs 0.9 vs 0.8 ms
+
+## Scalibility
+
+* base: RO
+
+* remote SSL, simple queries
+  * best throughput **37 639** tps (for 156 clients connected)
+  * best latency 1.000 ms (for 6 clients)
+  * compromise: **31 000 tps 1.837ms** (for 58 clients)
+
+* remote, noSSL, prepared, PL calls
+  * Best **181 000** tps (140 clients)
+  * Best 0.254ms (10 clients)
+  * Compromise **156 945 tps 0.3ms** (60 clients)
+
+## Misc settings
+
+* App level
+  * connection persistence
+  * no ssl
+
+* OS level
+  * Filesystem: **XFS**, ext4, ~ZFS~ (he's not a fan because PG is already doing semantics), care about mount options
+  * IO
+
+* HW level
+  * better harware (so more €))
+  * SSD
+  * cache units...
+
+## TL; DR
+
+* no TPS only. **Latency matters**.
+* DO MEASURE perfs. **pg_bench is there and very easy** to write custom scripts. So use it please :). It's being improved constantly.
+* use PG 9.6.
+* Costs. A lot of time is spent on network, `parse` & `plan`.
+* RW load: go for SSD for sure.
+* RO load: HDD == SSD
+
+## Q/A
+
+* Checkpoint Completion target (pgbench param) have you changed it?
+  * Yes I did change it... :p.
+* Parallel queries? What is the impact?
+  * Good for aggregation. For multiple clients in parallel it doesn't change much.
+*
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# A look at the Elephant's Trunk - PG 10
+
+* Magnus Hagander (redpill linpro - sweden)
+
+## New era of versioning
+
+* major used to be x.4, x.5...
+* new majors will be 10.x, 11.x Full digits !
+
+## Schedule of PG 10
+
+* Master is always next major version
+* August 2016 branch 9.6
+* CF (Commit Fest) Sept CF1, Nov. CF2, Jan 2017 CF3, March 2017 CF4 in progress
+* ~ 1300 commits by now == a lot of new features
+
+## Go go go, New features
+
+## Small things
+
+* drop support for protocol 1.0
+* drop support for floating point timestamps. (compile flag)
+
+## Bigger things
+
+* `pg_xlog` → `pg_wal` renaming /o/
+* `pg_clog` → `pg_xact` renaming /o/
+* all functions that had `xlog` in the name are renammed to `wal` at the SQL level. E.g. `pg_receivexlog` is now `pg_receivewal`
+* same thing for all cli parameters. E.g. `pg_basebackup --xlog-method` → `--wal-method`
+
+## good news (client)
+
+* `\gx` in psql shows extended display for single queries.
+
+## SCRAM authentication
+
+* Salted Challenge Response Authentication
+* standardized way to auth
+* more secure than md5 (easy :p)
+* switch WHEN your clients support it.
+* easy upgrade as soon as you control your clients.
+
+## libpq enhancements (client)
+
+* multiple hosts can be specified `host=pg1,pg2,pg3`
+* `host=pg1,pg2,pg3 target_session_attrs=read-write` be sure your rw host will receive the queries
+* `.pgpass` overridden
+
+## Monitoring
+
+`pg_stat_activity` 
+
+* `pg_stat_activity` will now include walsender activity. With `application_name: walreceiver` and `query: walsender`
+* new wait events
+  * latches
+  * I/O events
+* reads
+* writes
+* individually identified
+
+## Developer and SQL features
+
+* `regexep_match()`
+  * just like `regexp_matches()` but not SRF but easier AND faster if you need one match.
+
+## PL/python
+
+* now supports multi-dimensional arrays
+
+## Data ingestion
+
+* `file_fdw` can now use a program. _Outch shell injection?_
+* COPY VIEW FROM is now supported as long as INSTEAD OF is used
+
+## XMLTABLE
+
+* (almost) per SQL standard
+* convert XML document to resultset.
+* mapping xpath: Converts a whole XML document (with xpath filters) into columns.
+* much faster than individual queries
+
+## Backup and replication
+
+## new defaults
+
+* new postgresl.conf defaults
+  * `wal_level = replica` /o/ :clap: :clap:
+  * `max_wal_senders = 10`
+  * and `max_replication_slots = 10`
+* new pg_hba.conf defaults
+  * allow replication connections by default
+
+## Replication slots
+
+* temporary repli slots. VERY good for backup operations for example.
+* 'cause it automatically dropped at end of session
+* prevents fall-behind of filling disk risk
+
+## pg_basebackup
+
+* WAL streaming supported in tar mode (`-Ft`)
+* better excludes
+* new defaults
+  * WAL streaming now default (`-X`)
+  * uses temporary replication slot by default
+
+## pg_receivewal
+
+* supports compression
+
+## quorum based sync repli
+
+* `synchronous_standby_names = ANY 2 (pg1, pg2, pg3, pg4)`
+
+## logical replication
+
+* based on WAL
+* and logical decoding
+* replicate individual objets
+* new `PUBLICATION`. `CREATE PUBLICATION testpub FOR TABLE testtable;`
+* new `SUBSCRIPTION`. `CREATE SUBSCRIPTION testsub CONNECTION 'host=pg1 port=...' PUBLICATION testpub;`
+
+* ⚠️️  still work in progress
+* ⚠️️  still no initial data copy yet.
+* ⚠️️  and no sequences
+* ⚠️️  not suitable for fail-over.
+
+## postgres_fdw
+
+* push down aggregations
+
+## Hash indexes
+
+* YOU CAN START using them
+* now has WAL logged
+  * no useful!
+* many perf enhancements
+  * better caching
+  * page level vacuuming
+* sometimes better than btree!
+* ⚠️️  sometimes don't work
+
+## Partitioning
+
+* based on existing inheritance
+* **MUCH easier to work with.**
+  * automatic tuple routing
+* more limitations → more optim (soon)
+
+* range partitioning (single column only)
+* list partitioning
+
+* ⚠️️  still many limitations
+  * no row-movement
+  * no cross-partition indexes
+  * no cross-partition keys
+  * no partition-wise processing
+  * no tuple routing for foreign partitions
+
+## More Parallelism
+
+* 9.6 introduced parallelism
+  * seq scans
+  * aggregates
+  * hash and loop joins
+
+### Usability
+
+* new param `max_parallel_workers`
+* query string now in workers
+* shows in pg_stat_activity
+
+### Subqueries
+
+### index scans
+
+### merge joins
+
+
+* already a lot
+* but we're not done yet
+  * ⚠️️  extended statistics
+  * ⚠️️  hash support for grouping sets
+
+## Still lots to do
+
+  * lots of smaller fixes
+  * perfm improvements
+  * etc
+
+## Please help! Please
+
+* **we need more people**
+* if you can **review C code**, please come to Commit Fest
+* if not, please **run postgresql 10**! Test it NOW!
+  * apt, npm packages available often updated
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# Infrastructure Monitoring
+
+* Steve Simpson (Stack HPC)
+* from Bristol, UK
+* Systems Software Engineer
+* currently working for Stack HPC
+  * multi tenant
+  * Handles cambridge university's 100 node HPC openstack cluster
+
+## openstack
+
+* "your own AWS"
+* very complex
+* monitoring can be complicated
+
+## Problem about monitoring?
+
+* boring
+* and essential (a bit like backups)
+* you need it when things break
+
+## Why monitoring?
+
+* Fault finding and alerting
+* Fault post-mortem, pre-emption
+* How efficient is your system?
+* Auditing (secu, biling)
+
+## Existing tools
+
+* nagios / icinga
+* `ping -c 1 | mail -s "Help" @me`
+* ELK
+* lots of stuff...
+
+## Can become complex
+
+* new trend Grafana + InfluxDB for metric API alerting
+* log API → ELK
+* adds a Kafka in the middle
+* then adds a Java `storm` thing
+* it's a huge architectural mess...
+
+## Why not put PG where you need to store data?
+
+* replace InfluxDB for PG
+* replace sqlLite for PG
+* replace Elastic for PG (so replace kibana by grafana)
+* logstash replaced by text parsing
+* basically replace everything with PG + grafana!  
+
+## PG for metrics
+
+* a set of PG tables well structured
+* using timestamps
+* using jsonb for "dynamic" metadata values
+
+## Some problems arises
+
+* if you need `DISTINCT` on a 45M row table = _Outch_.
+
+## Use indexes luke!
+
+* covers all necessary query terms
+* using GIN on metrics
+
+## Use IDs to map values
+
+* "normalised schema"
+* create a view to make the queries easier to write
+
+## As time window grows, less detail is necessary
+* 30s interval at 1 hour
+* 300s interval at 6 hour
+
+## Log searching
+
+*
+
+## Log parsing?
+
+* regex_matches to the rescue :) "logstash style"
+
+## PG for Queueing (replace Kafka)
+
+
+## POC available on Github
+
+* githuc.com/stackhpc/pgmon
+* not production ready
+* extended open source Monasca to use PF for:
+  * alert state history
+  * time-series monitoring
+
+## TL; DR
+
+* monitoring in PG is not new
+* just fallen out of interest
+* many forget sometimes relational solutions are just fine
+* many want to build their own db system
+* ops avantages of using general puprose tools can be huge
+* **Use & deploy what you know & trust**
+* batteries not always included
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# MLS Postgres and SELinux
+
+* fined grained security
+
+# Replication & Recovery in PG 10
+
+* Simon Riggs (2ndQuadrant)
+
+* 2ndQuadrant, sustainable Open Source Dev (for PostgreSQL) 💚 
+* Great people, Thank you!
+* employees in 22 countries
+
+## PG 10
+
+* paraphrasing a bit Magnus
+
+## Recovery & Robustness
+
+* lots of trust in PostgreSQL
+
+## Design, Code, Review, Commit
+
+## Review
+
+* paraphrasing Magnus about new defaults on replication settings
+* Thanks Magnus
+
+## Design
+
+* quorum based
+
+## Replication lag tracking
+
+* speeding up application of changes on standby servers
+* replication lag is much smoother than before
+* NEW **Replication lag tracking metric** built in
+  * write_lag
+  * flush_lag
+  * apply_lag
+
+## Logical Replication - "Data flow"
+
+* a pub-sub system
+* `PUBLICATION` and `SUBSCRIPTION` cf Magnus's talk about this new feature
+* It's a permanent definition so it can actually be used in a `pg_dump`!
+* can be one table or a list of tables.
+* you can even select which changes to replicate (only insert and updates for instance, to be able to create a historical snapshot database)
+
+## Data integration
+
+* Trust PG for your data!
+* A transactional database
+* And a reporting database with replication
+
+## PG Rollout
+
+* You can easily manage your data with replication
+* by replicating whatever tables to different databases
+
+## PG rollup
+
+* Used for PG sharding (Postgresql-XL)
+
+## Online upgrade
+
+* Logical replication to the rescue
+  * accross release level 9.4 → 9.6
+  * Extension on 9.4+ `pglogical` 2.0 to help you do that
+
+## Row filtering
+
+* With logical replication you can filtre row by adding a WHERE clause to replication
+
+## Multi-master repli
+
+* Postgresl-BDR with replication heading both directions
+* Geographically distributed multi master system
+
+## Postgresql-BDR
+
+* when looking at the changes done in BDR
+* lots of the changes needed for it has been integrated little by little into postgres
+* E.g.
+  * background workers in 9.3
+  * event triggers in 9.4
+  * Commit timestamps in 9.5
+  * logical WAL messages in 9.6
+  * logical replication  in 10
+  * and long distance but we are getting there...!
+
+## All this for free?
+
+* some people ask: when are you gonna get a job? How do you do to release all this free?
+* 2ndQuadrant has clients, support, consulting and it's enough.
+* few bunch of people coding. but NOT too many
+
+## Postgresql
+
+* multi company supporting PG. It's great.
+* Great community.
+* everyone wants to have a robust Postgres.
+* higher level of quality and faster than any commercial product. That's pretty good.
+
+[↑ Back to the list of talks](#talks)
+
