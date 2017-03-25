@@ -5,7 +5,7 @@ tags: conference, pgday, Paris, postgresql
 skip_to_link: { talks: "Skip directly to the talks transcripts 📝" }
 ---
 
-PostgreSQL is known to be a very good relational database system. Because it is robust, because it has all the features than modern SGBD databases systems expects. On top of that it is an open source and free software with a very wide community behind it. This community is filled with great people trying to make the postgreSQL ecosystem as good as possible.
+PostgreSQL is known to be a very good relational database system. Because it is robust, because it has all the features that modern RDBMS databases systems expects. On top of that it is an open source and free software with a very wide community behind it. This community is filled with great people trying to make the postgreSQL ecosystem as good as possible.
 
 Today I had the chance to attend the [PgDay Paris 2017](http://www.pgday.paris/2017/schedule/){:target="_blank"} event and it was a very nice day. I tried to take some notes about the talks and wanted to share with you what I saw. Most of the talks have [slides available online](https://wiki.postgresql.org/wiki/PgDay_Paris_2017){:target="_blank"} but if you want more detail about what was said and what I captured during this event please follow the page bellow :){:target="_blank"}.
 
