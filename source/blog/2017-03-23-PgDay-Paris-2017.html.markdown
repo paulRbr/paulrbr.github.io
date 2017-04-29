@@ -11,7 +11,7 @@ Today I had the chance to attend the [PgDay Paris 2017](http://www.pgday.paris/2
 
 ## Small conference for better encounters
 
-This is a great [one day conference](http://www.pgday.paris/2017/schedule/){:target="_blank"}. It is usually a cheap event, with great speakers from the PostgreSQL community around the world and is held entirely in English. If you have the chance to attend you should come! This year's 2017 edition was my second [pgday.paris](http://www.pgday.paris/){:target="_blank"} and I was verry happy to be part as a spectator.
+This is a great [one day conference](http://www.pgday.paris/2017/schedule/){:target="_blank"}. It is usually an affordable event, with great speakers from the PostgreSQL community around the world and is held entirely in English. If you have the chance to attend you should come! This year's 2017 edition was my second [pgday.paris](http://www.pgday.paris/){:target="_blank"} and I was verry happy to be part as a spectator.
 
 Huge thanks to the Staff organising the event! [@shaysler](https://twitter.com/shaysler){:target="_blank"}, [@pg_krol](https://twitter.com/pg_krol){:target="_blank"}, [@pg_xocolatl](https://twitter.com/pg_xocolatl){:target="_blank"}, and Katharine Atwood.
 
