@@ -4,10 +4,10 @@ install:
 script:
   - bundle exec middleman build --clean
 after_success:
-  - openssl aes-256-cbc -K $encrypted_cd32eca6684a_key -iv $encrypted_cd32eca6684a_iv -in deploy_key.pem.enc -out deploy_key.pem -d
+  - openssl aes-256-cbc -K $encrypted_cd32eca6684a_key -iv $encrypted_cd32eca6684a_iv -in deploy_travis.pem.enc -out deploy_travis.pem -d
   - eval "$(ssh-agent -s)"
-  - chmod 600 deploy_key.pem
-  - ssh-add deploy_key.pem
+  - chmod 600 deploy_travis.pem
+  - ssh-add deploy_travis.pem
 deploy:
   skip_cleanup: true
   provider: script
