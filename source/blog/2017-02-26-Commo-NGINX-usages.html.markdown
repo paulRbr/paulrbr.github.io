@@ -188,7 +188,7 @@ Indeed with time I found that most conditions can be solved with variables defin
 
 Whenever you need a condition in your configuration try to define a variable that will solve this condition for you through a `map`. **I recommend to organise all of your conditions in the `maps.d` conf directory where all your `map`s will live.**
 
-E.g. let say you want to add conditions on requests' origin to differentiate your private from public interactions:
+E.g. let say you want to add some conditions based on your requests' client IP to differentiate your private from public interactions (the IP condition is done by [nginx's geo module](http://nginx.org/en/docs/http/ngx_http_geo_module.html)):
 
 ~~~ nginx
 geo $geo {
@@ -214,10 +214,10 @@ Then in your site definition you don't need an `if` directive to add limiting re
 
 ~~~ nginx
 # Define a limit request zone named 'api' kept in a 10 megabyte zone
-# where the average request processing rate cannot exceed 5 request per second depending on the $limit key.
+# where the average request processing rate cannot exceed 5 request per second depending on the $limit_key.
 # I.e. rate limiting for public requests will be based on the origin IP
 # and no limiting will happen for private requests.
-limit_req_zone $limit zone=api:10m rate=5r/s;
+limit_req_zone $limit_key zone=api:10m rate=5r/s;
 
 location /api {
   limit_req  zone=api burst=8; # Burst after more than 8 r/s
