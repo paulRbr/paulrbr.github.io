@@ -328,7 +328,8 @@ a.button:active {
   font-size: .90em; }
 
 #wave {
-  width: 40px;
+  width: 140px;
+  font-size: 1.4em;
   margin: 0 auto;
   transition: all 0.3s ease-out; }
 #wave:hover {
