@@ -1,26 +1,27 @@
-image: ruby:2.3
+image: ruby:2.4
 
 cache:
   paths:
-  - vendor
+    - vendor
 
-test:
+.prepare: &prepare
+  before_script:
+    - apt-get update -yqqq
+    - apt-get install -y nodejs
+    - bundle install --deployment
+
+test: &test
+  <<: *prepare
   script:
-  - apt-get update -yqqq
-  - apt-get install -y nodejs
-  - bundle install --path vendor
-  - bundle exec middleman build
+    - make build
   except:
     - master
 
 pages:
-  script:
-  - apt-get update -yqqq
-  - apt-get install -y nodejs
-  - bundle install --path vendor
-  - bundle exec middleman build
+  <<: *test
   artifacts:
     paths:
-    - public
+      - public
+  except: []
   only:
-  - master
+    - master
