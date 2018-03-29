@@ -1,0 +1,1072 @@
+---
+title: pgDay Paris 2018
+date: 2018-03-15
+tags: conference, pgDay, Paris, postgresql
+skip_to_link: { talks: "Skip directly to the talks transcripts 📝" }
+---
+
+Once again this year the great staff of pgDay Paris did it all. We had a very good **pgDay Paris 2018** edition. A great location in the center of Paris near Beaubourg. A diverse and interesting line-up. And as usual, a **joyful community**.
+
+## Talks
+
+_Morning_
+
+* [**Lætitia Avrot** ⋅ _De-mystifying contributing to PostgreSQL_](#de-mystifying-contributing-to-postgresql)
+* [**Will Leinweber** ⋅ _Constraints: a Developer's Secret Weapon_](#constraints-a-developers-secret-weapon)
+* [**Louise Grandjonc** ⋅ _Being a better developer with Explain_](#being-a-better-developer-with-explain)
+
+_Afternoon_
+
+* [**Charles Clavadetscher** ⋅ _Triggers: Friends To Handle With Care_](#triggers-friends-to-handle-with-care)
+* [**Hannu Valtonen** ⋅ _Change Data Capture for a brave new world_](#change-data-capture-for-a-brave-new-world)
+* [**Saâd Dif** ⋅ _Herd of containers_](#herd-of-containers)
+* [**Magnus Hagander** ⋅ _A look at the Elephants trunk for PostgreSQL 11_](#a-look-at-the-elephants-trunk-for-postgresql-11)
+
+ 🌩
+
+* [⚡ **Lightning talks** ⚡](#lightning-talks)
+
+# De-mystifying contributing to PostgreSQL
+
+**Lætitia Avrot** - **[@l_avrot](https://twitter.com/@l_avrot)** - [📝 See slides of the presentation](https://www.slideshare.net/LtitiaAvrot/demystifying-contributing-to-postgresql)
+
+> "Who is already contributing to PG?"
+
+_a few hands up_
+
+> "Who wants to contribute to PG?"
+
+_more hands up_
+
+Well you already are contributing by being here! Thanks!
+
+I am a **DBA**, worked with pretty big clients. Really fun to have big customers with big constraints. I Work for **Loxodata**, our 3 pillars are:
+
+- _PostgreSQL_
+- _DevOps_ we are trained in that way
+- _Cloud_ we help people controlling their data and what they are sharing
+
+One year ago, I wanted to contribute to PostgreSQL but didn't know where to begin. **So how do you do that?**
+
+## The community
+
+### How is it structured?
+
+**Core team** is made of five members (independent) they act as Project managers. **What is important: no one owns postgresql.** Core members are responsible to answer/close discussions inside the community. But this rarely happens because the community usually agree by themselves.
+
+Then we have **committers**: they have git push permissions. I like to say they are "upgraded developers".
+
+Around this kernel of people we have:
+
+- **developers**: They need to comply with style guide lines, they need to comment, they need to comment **A LOT** :). "3 lines of comments for one single LOC"
+
+- **reviewers**: anyone can become a reviewer. Just come to a commit fest and participate. If **you don't understand something: others won't neither!** So it's good to say it!
+
+- **translators**: No need to be a developer. What needs translations? Software messages, documentation, press releases...
+
+On the side of all these great people there is **an advocacy group**. Indeed, you need to promote what you are doing (via blogpost, events, booth, ...). This advocacy group is composed of:
+
+- **Associations** (PG US and PG EU for example)
+- **User groups** (meetups)
+
+You are welcome to create meetups if none exist around you in the world! You will be rewarded for that!
+
+And last but not least: the **users** \o/ you are part of the community by using PostgreSQL!
+
+### Projects
+
+The postgresql projects are versioned within GIT repos:
+
+- PostgreSQL code base
+- Translations repos
+- Contribs and tools repos
+- Project Mngt repo (commit fest mngt, maintenance stuff you will probably not need to clone that one)
+- Packages repos
+- Communication repos (they help manage ML, websites and so on)
+
+### Road map
+
+One major release is done per year. There is a minimum of one minor per quarter. Of course there can be more minor releases (security patches for instance).
+
+An upgrade of data is only needed for major release upgrades.
+
+### Commit Fest
+
+It is a one month long period. **Developers stop writing patches!** We need to review everything of what has been submitted and written. In that moment **we need reviewers**.
+
+Managed by a Commit Fest manager. Not necessarily a developer. Right now, we are in the March commit fest (CF happen once every two month). You are welcome to come and make comments, so don't hesitate to come:
+
+[commitfest.postgresql.org](https://commitfest.postgresql.org)
+
+### Tools
+
+Websites:
+
+- [postgresql.org](https://www.postgresql.org/)
+- [wiki.postgresql.org](https://wiki.postgresql.org)
+- [/docs](https://www.postgresql.org/docs)
+- [planet.postgresql.org](https://planet.postgresql.org) (lots of blogposts) _[the twitter](https://twitter.com/planetpostgres) is also really nice [@planetpostgres](https://twitter.com/planetpostgres)_
+
+Mailing Lists or associations near you.
+
+If you want to submit a bug there's a **form on the postgresql.org website**.
+
+If you are new, you might be interested with the **PostgreSQL-novice** mailing list. There are special MLs for local groups and associations. The most important ML is **PostgreSQL-hackers**. _/!\ 50 different subjects in the same day!_
+
+If you find security issue: don't post it on a public ML. **Send an email to security@postgresql.org**
+
+IRC: Last time I connected, more than 1000 people! **Old but still alive**. Really great to be able to live chat with PG users. Don't ask to ask: ask!
+
+Twitter: **[@postgresql](https://twitter.com/postgresql)** you can find important info such as releases, but also what's going on in the community
+
+Slack, Hangout, ...
+
+## My story
+
+My colleagues made fun of my GIT level. They said I had a ["XKCD level"](https://xkcd.com/1597/)...
+
+What you need to know:
+
+- `git clone` to clone the repo on your laptop
+- `git pull` to get new modifications
+- `git diff` to make a patch
+
+There is a postgresql wiki page that helps if needed. If you want to show off you can use git pull with the rebase option.
+
+**So what is a patch?**
+
+It is a fix to improve something: **don't make it worst than it is!** Keep this in mind. Be open minded about that :)
+
+### The story of a patch
+
+I was in Warsaw and noticed there was a missing sentence in the PG documentation. I asked a colleague and got this answer: **"Oh yeah I know, it's been there for years"** **"Grrrr"**
+
+The community told me I could fix it, Wow, I didn't think I could.
+
+Creating the patch: clone, build the project. Then my patch was to copy a sentence from the `create table` doc to the `alter table` documentation page. **That's it!**
+
+`git diff` shows the difference between your files and the repository. Don't forget to format your git diff output. **You'll need to send it to submit your patch!**
+
+A git diff WITHOUT context and a git diff WITH context **is not the same**: with context it preserves indentation!
+
+**Submitting** the patch is a matter of sending an **email to the PG-hackers ML**.
+
+> "Hey I have done that and here is the patch, what do you think?"
+
+The answers I got:
+
+- "Thank you"
+- "oh there's another missing sentence in this page, maybe you can fix it too?" Too late, someone had already done that one.
+
+Next step happens **during a commit fest**. Oh no, something is wrong and my patch doesn't build anymore. So I needed to correct it. Then yet another part of the documentation was missing so I corrected it again.
+
+And then **YEAH!** Committed in the trunk! _I can die now!_ Well not yet I can continue to contribute :)
+
+## What's next
+
+I observed reviewing in a commit fest and thought I should try to help in the March commit fest.
+
+I connected a few days after the first day of the month but the only patches left were very hard peach's that no one was willing to review...
+
+I thought "I should connect the first day to find easy patch". Well.. **No! That's not needed**. It's ok to **review multiple times the same patch**.
+
+However the community also advised me to do more Call For Papers and submit talks. Yes, because that is also a great way of contributing to the community.
+
+## So how to help?
+
+**Simple contributor**: uses PostgreSQL, go to meetups, ask questions or answer questions. What's important: **they share their experience**. You will find people with other issues, other constraints. Maybe you will meet people that have the same problem as you! That's great. And you can also say what is lacking in PostgreSQL.
+
+**Great contributors**: they help organising user group, meetups. They invest time and money for the PostgreSQL community.
+
+**Super Contributors**: they report bugs, review patchs and create patchs. **You can become a super contributor!** **Just review patches!** And maybe you will become a better C programmer.
+
+## TL;DR What do I want you to remember
+
+- It's all about **you**
+- You are **already contributing**! And that is appreciated by the community.
+- What is your **next step?**
+- **Anyone can patch!** Go out of your comfort zone. You can ask for **mentoring**. The community will be happy to find a mentor for you.
+- You are **welcome to join** us. We are happy to welcome you. **Open minded community.** Don't be afraid to talk to people.
+
+### Any questions? BTW Loxodata is hiring
+
+**Q.** ~ number of developers at the moment
+
+**A.** There are two kinds: **core** developers (about **30** of them) and others **developers** (about **3000**). PG is a project with lots of history. I even learned once Julian Assange already contributed to PG.
+
+**Q.** Are there any "real world" Commit Fest?
+
+**A.** No it's 100% online. There only exists meetups for developers in Ottawa in the US.
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# Constraints: a Developer's Secret Weapon
+
+**Will Leinweber - [@leinweber](https://twitter.com/@leinweber) - citusdata.com** - [📝 See slides of the presentation](https://www.postgresql.eu/events/pgdayparis2018/sessions/session/1835/slides/70/2018-03-15%20constraints%20a%20developers%20secret%20weapon%20pgday%20paris.pdf)
+
+I'm gonna talk about constraints. Doesn't seem particularly exciting yet. It took me a long time to realise how it they [constraints] could actually **help me**.
+
+Common things I hear about storing data in a DB: 
+
+_"I just want to store my data"_<br/>
+_"I just want it to be faster"_<br/>
+_"I want fancy expressions"_
+
+So yes constraints might not be the most excited subject. It could even be seen as a "parenting" subject: _"no I don't want to use constraints"_.
+
+So I tried to go back to where I come from. Rails changed the landscape of software development. Before Rails it was really easy to find spaghetti code. **HTML with a SQL query** inside it... Or before that **multi xml file frameworks**.
+
+Rails helped to bring conventions over configuration. That is what we can call **adding constraints**.
+
+E.g. A primary key is called `id`. That's it don't try to call it otherwise. That is **adding a constraint**.
+
+At the same time to what rails did on the **application side**. They managed to do the same for the database. **Rails said** a database is a **"big dumb hash in the sky"**. Specially at the beginning, when it was mainly mysql, and then postgresql arrived a bit later. As Rails wanted to touch the biggest audience, they started with MySQL to attract users as a "common denominator". But with years, postgresql support got better and better.
+
+In the meantime I was learning to do web applications. I learned a few lessons. I.e. `UPDATE` statement SHOULD have a `WHERE` clause ⚠. `Begin` transactions to make sure you don't mess up everything when you are testing around.
+
+It is **hard to train from example** (book, examples on the web). During this learning period there is a particular moment that I recall. My mum was moving house and found a whiteboard in the basement. I remember spending a lot of time on that whiteboard with a set of 4 tables in relation one another. I was trying to put in my head all of the model and taking a lot of time thinking about the relationships and really **absorb the modelling** of these tables.
+
+So now I work backwards and think a lot about the **data schema FIRST**. With that marker whiteboard thing, I remember the time I spent on it and how hard I focused on the tables and data. But it does get better the more you do it don't worry.
+
+Along the way, something you realise is that you want your **database** to be your **last line of defence for your bugs**. It took me a long time to realise this.
+
+Your **code** will have **loooots of changes** compared to **your schema**. A schema has a kind of weight. It is **hard to change** your schema and tends to not happen very often.
+
+Stats of main apps for motivating this:
+
+- **~1 yr old** app, **71** db migrations (adding tables, adding columns...), **1203 release** to prod. Way more code changes than on the DB side.
+- **~2yrs old** app, **90** migrations, **1454 releases** (+20 DB migrations, + 200 code changes).
+
+It's natural to assume but YES **application change much more often**. Same likely hood, in your application code than in your schema. Both are possible but it's **much more likely to be in your code base** rather than in your database schema. The problem with these sort of bugs (caught by schema) is that they are sort of **"delayed"** you don't know when they will be happening. **Probably months later.** And as it's delayed it gets **really hard to debug** and find the cause. If you are lucky, all writes come from one part of the code and it gets easy. But often, who knows?
+
+I remember one time I was working an application. We had some duplicate rows each duplicates had **very small differences**. **1/3 of rows had duplicates**. But no information to really know if it was version A or version B the correct row... So we took **arbitrarily one over another** and **waited for someone to tell us** the data was wrong...
+
+So my new motivation is: **don't write BAD DATA in the first place!**
+
+## Traditional constraints
+
+`NOT NULL` it should be the case: **every column** should be not null in most cases.
+
+`CREATE UNIQUE INDEX` it adds a performance cost. But I would rather have **everything with a unique constraint**. (you can remove it later if it is a real cause of bad performance)
+
+**Partial unique** `CREATE UNIQUE INDEX ON users (email) WHERE deleted_at IS NULL` Registers, where you want to mark a delete with a timestamp for example. This allows people to have unique emails, But **OVER TIME** the ability to have a unique constraint on a subset of data. Even if you are doing that, it keeps index much smaller.
+
+If you think about your data model with **"should be"**, **"should have"** then **put that as a constraint**! If you think your data "should be positive" then **put the constraint**!!
+
+## Data types
+
+They are constraints too. Yep.
+
+Prevents wrong data to enter in your database. **Numbers** needs to **be numbers** and not string of course... **Bools** needs to be **booleans**.. This is where PG really shines. Compared to other kind of databases, not naming any..., which then forces adding a **constraint in the code base** to make the check **FOR the database**: as we saw that's **NOT where we want** these kind of logic.
+
+`ENUM` limited set of values. **Cons:** you can't remove any element once in the enum list. **Pro:** space saving. E.g. aws regions: they do add some overtime but not that often. **Helps to prevent TYPOS**
+
+`range`s `::int4range` there are multiple ranges (numeric, bigints..., timestamp with timezone `tstzrange`). One of the things we use them for: they allow **exclusion constraints** and that's a good thing.
+
+Not only data type constraint: `COLLATE "C"` for very specific texts and limiting character set of a text.
+
+A lot of other data types, `uuid` (100% v4 of uuid), `macaddr`, `inet`, `cidr` (used that an a network where all the routers would send presence beacon, and I simply stored the `macaddr` directly in postgresql), `array`, `geometric` are nice too.
+
+`JSONB`is really good too. The downside though, **you don't get the type checking INSIDE** the document..
+
+## Foreign keys
+
+it's "easy" to do, just add a reference to a column in another table. **To not get unexpected nulls**. Something is **ACTUALLY pointing to a real data**.
+
+Some nice options:
+
+- `NO ACTION` / `RESTRICT` (when the exception happen in your transaction)
+- `CASCADE` if you want your delete to delete everything that is linked
+
+The main thing I had is that... it makes the testing harder with foreign constraints. With: **transactions** vs **truncating**. You might need your testing framework to truncate rather than use transactions. In order to not get foreign key violation in your test tear downs.
+
+## CHECK constraints
+
+Full custom logic. **Almost anything you want**. This is your **point of no return** for loving constraints. "TO get that last bit out".
+
+`CHECK(price > 0)` I always do that.
+
+For instance, let's say you have a sale price and you want the sale price to be cheaper than the original price. `CHECK` to the rescue. \\o\\
+
+If a column is a percentage, `CHECK` to the rescue. /o/
+
+Check can do a lot, so if you have a **json col**, and know that one property is an integer: you can **add a constraint on your JSON document**!
+
+Example with a **user defined function** to know if a number is in the fibo suite or not. This function just do some maths. Well you can **use that function in a CHECK** `i int CHECK (is_fib(i))` if you try to enter 6 in your column it won't work and you will have an exception from your DB.
+
+## EXCLUSION constraints
+
+One of the most **interesting feature** (in my pov). **Can be complicated**... but when you have a problem that is solved by exclusion constraints: **it can't be done any other way**.
+
+Overlaps: `select '[1, 10)'::int4range && '[9, 20)'::int4range;`
+
+Imagine a billing system where we want to **charge someone monthly**. The last thing I want: if they add a node in the middle of the month I **don't want to charge** them the full monthly charge.
+
+Table with three fields:
+
+- `formation_id uuid`
+- `validity_period tstzrange`
+- `price_per_month integer`
+
+`EXCLUDE USING` a GIST index: `formation_id WITH =, validity_period with &&`
+
+If you try to enter an incorrect value: And you get a good error message: it tells you what you have conflicted with.
+
+## TL;DR
+
+- **DON'T HAVE Bugs** in your code base **by having more constraints**.
+- lots of **great constraints in postgresql**.
+- applying only **easy ones** can already give you a lot! Do it!
+- **data types** are constraints too.
+
+## Questions?
+
+**Q.** When we have a performance issue with database. Every aspects says: drop your constraint.
+
+**A.** Definitely. with CHECK constraint you are going to **get a performance hit**. But when it's a hit for a user insert: **I'm willing to pay** for that. But if it's a **machine generated** thing then **yes you might not need them**. But it's matter of **having them NOW**, and realise later. **Correct first**, **fast later**. I think it's better like this.
+
+**Q.** Do you prefer ENUM over foreign key constraints? "Using foreign keys for enum technique"
+
+**A.** Advantages of having it as a separate table: you have much more control to add or edit the values. But I really like `ENUM`s. It's a good technique though. I'm gonna add this technique to my talk :).
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# Being a better developer with Explain
+
+**Louise Grandjonc** - **[@louisemeta](https://twitter.com/@louisemeta)** - [📝 See slides of the presentation](https://fr.slideshare.net/LouiseGrandjonc/becoming-a-better-developer-with-explain)
+
+What I am going to talk about would make **DBAs really happy** if all **developers knew** it.
+
+A little bit about me, I work at Ulule, a **crowdfunding company**, mostly in France, Italy, Belgium, Spain and Canada. similar to "kickstarter" but with **wine and baguettes** I guess.
+
+I am a developer and work with django and python. I also love PostgreSQL.
+
+I will focus mainly on SQL, ORM and query plans. Let's start by asking ourselves a few questions:
+
+- "Can **understanding the query plan** help, and how it can help me"
+- "What if I'm **using an ORM**, does it still apply to me?"
+- "What **happens in my database** when **I send a query**".
+
+First Q. "can it help?" Well, of course it does for the sake of my talk!
+
+The **mystery of querying** stuff. It's a **"big question" and interesting one**.
+
+Your SQL query is **parsed**. Then a **query tree** is generated (internal postgres datastructre) and detect syntax errors. Then it will go to the **planner**. Postgresql will **generate multiple ways** of doing your query and **calculate the cost** of each way. The best one is chosen to **execute** your query and 🎉 you get your **result**.
+
+Why is it important to **know your plan**? It will help to know **why your query is slow**. Why it is sorted or ordered.
+
+What if I use an ORM? They can often be **"beast that DBAs hate"**, however it is not about a fight, it is more about a **reality**, **developers use ORMs** because it is much better and easier to write code with them.
+
+Developers, you need to **know what your ORM** is cooking for you. **Don't be afraid**. The ORM might be generating slow queries. Si it is really interesting to **look at your logs**.
+
+What kind of dirty things happen with an ORM?
+This is a story of an old company: owls have a job where they deliver letters sent by humans. 10 002 owls, 10 000 humans, 400 000 letters.
+
+Loop with the django ORM by using a `filter` function (basically a where clause) then `for owl in owls: print(owl.job)`. What you get: **a s`SELECT` for **every single owl** 😱.
+
+In django you solve this: by using `select_related`.
+
+So yes it is important to **look at your logs**! You can easily look at your postgresql logs, In `psql`: `show log_directory;`, `show data_directory`, `show log_filename` to find your current log file path and name.
+
+When you know where your logs are: change your postgres configuration locally to **log everything** (if you are a developer of course: so **only locally**). So you will set `min_duration = 0` and all `logging_*` config to log everything.
+
+`pg_stat_statements` is an extension that will track queries executed on your server. It can also be reqlly useful. `CREATE EXTENSION` to add it and don't forget to add it to your `shared_preload_libraries` config and to restart postgres.
+
+Once enabled you can find painful queries. `select ... from pg_stat_statements order by mean_time DESC limit 100;`Boom you get **all your your slowest queries**!
+
+**tl;dr be careful of your codes' query execution by looking into your logs. You'll make DBAs happy**.
+
+## `EXPLAIN` query plan
+
+what is it? It will give you the **execution plan chosen by the query planner**. If you use analyse, it will actually run your query `EXPLAIN (ANALYSE)`. You can rollback don't worry:
+
+`BEGIN; EXPLAIN (ANALYSE) ...; ROLLBACK`
+
+You will thus be able to do `EXPLAIN`s on `UPDATE`s queries too.
+
+_Example query with it's execution plan on the slides of Louise._
+
+**`Sequential Scan`**? What does it do: it is going to **read the entire table row by row** and filter what it needs. Meaning it will read everything. **It can be expensive** on big tables.
+
+What you might need is **an index**. Little reminder of what an index is. It is a way to `find` for a value given an index table, my favorite example is for an encyclopedia: you **check the index** for your value instead of going through all the pages! It's the same in a database.
+
+Let's do the query plan again with the index: Yey an **`Index scan`** is now used instead of `Seq scan` and the cost is much smaller \o/.
+
+**Another example**. It's not because you have an index that your database will use your index. E.g. filtering with a really **common value**. **Why doesn't it use the index?**
+To read rows, you have a moving head in your database. To move from one row to another, it takes 1000 times more than reading the **next physical block**.
+
+**Gray area** between "common values" and "non common values": welcome **`Bitmap Heap Scan`**. Instead of using an index scan, it will use the **physical memory order** in a `map`. This is to avoid the "jumps that are slow" I mentioned earlier.
+
+If the **bitmap gets too big**, instead of getting each row in each map, instead of going row by row, your database will **read rows pages per pages**.
+
+Again in the encyclopedia example, a bitmap can be seen as "chapters".
+
+**`Nested loops`** what's that? A Loop inside a loop. 
+
+For each owl I will loop on jobs and find the one that are linked to that owl. Complexity is N*M. Used for little tables.
+What happens with big tables: it uses **`Hash Joins`**. E.g. in python you would use a dictionary with the keys of the owls. That is exactly what you would do: create a `Hash table`. **/!\ it has to fit in memory**. **Bad idea to do this for million rows**. Sometimes the cost of building this kind of hash table is bigger than using a nested loop.
+
+Joining on really big tables: **`merge join`**. What is happening there? It is **sorting both tables** and THEN it joins. The bottleneck here thus become the sort. If you don't have an index that **will probably be a problem**.
+
+3 types of join:
+
+- **`nested loop`**
+- **`hash join`**
+- **`merge join`**
+
+So what happens if we `ORDER BY`? The query planner of a `sort` will output the **algorithm used** for sorting and the **memory usage**. So if you try using a `LIMIT` in your query you will see the memory usage decrease drastically of course.
+
+**Top-N heap sort**. It sorts by building a tree, inserting values sorted directly in the correct leaf of the tree.
+
+If you are **using an index**, then it's using the **order of the index**. It's fast and that's much better :)
+
+Be careful with `order by` with **NO limit** and **NO index** it will **quickly become costly and slow**. You might need an explain...
+
+## A more complex example
+
+The Ministry of magic is asking you a list of letters sent to Voldemort and the date of potential replies to him together with the name of the person that replied.
+
+The python version would be something like: retrieve all letters **sent to voldemort**, retrieve all the letter **sent from voldemort** and then do a nested loop. **1500ms in python with my dataset**.
+
+As a database magician you want to use the **force of postgresql** because you can do better than 1500ms. With a **subquery** including letters from voldemorts with a **JOIN LATERAL** with another query which has voldemort as a receiver. **EXPLAIN: 48 seconds!!! /o\**
+
+Let's focus on the "depressing" explain plan. Filtering on 410 000 elements and taking only 1 000 of them. There's a seq scan there. It's only 45ms and not that slow **BUT *1000 it will be long**.
+Maybe I should be using an index? An index on `receiver_id`, `sender_id` and `sent_at`.
+
+Multi-column index specificities: **first index** will be in its **sorted order**, but the **second index** order will **depend on the first index's order**. The sorting for the second index is thus not usable for the other queries in your application.
+
+But in my case it's ok I create a **multiple index**: `receiver_id, sender_id, sent_at`. And now **it takes 7ms \o/!** Wowoo
+
+Can we do better? The explain show the index is used. That's already good. :)
+
+Let's look **even further**. The human table is using a `seq scan`. So you are retrieving **too many humans probably**. It is doing a hash table on your subquery.. Hmmm
+
+Let us try pagination: with a `sent_at > NOW() - 3 months` filter, suddenly the explain shows it's using the human_pkey index. Oh yeaaah. **Query is now 0.4ms**
+
+## Conclusion
+
+- As a **developer you really have to look into your logs**
+- Use **`pg_stat_statements`** if you don't know where your **biggest queries** are
+- Using `explain` will give you **information on your query**. It might not have any problem but you will be happy to **know the plan** :).
+
+### Questions
+
+**Q.** Limits with Top-N heap with offsets?
+
+**A.** What you need is probably pagination rather than offsets.
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# Triggers: Friends To Handle With Care
+
+**Charles Clavadetscher**  - [📝 See slides of the presentation](http://www.artesano.ch/documents/04-publications/triggers_pdfa.pdf)
+
+Some words about this talk: _special words of security (yes it is an entire different domain of Computer Science but will include a few mentions), how to manage triggers, use cases with a "Retour d'expérience",_
+
+Working at ETH Zurich (Economy universtiy). moving out of Oracle. Organising PgDay Switzerland.
+
+**What is a trigger?** It is **some code**, which is **executed each time an event** happen. It can be on any event `insert`, `delete`, `update`, `truncate`, `delete`...
+
+Everybody has already used triggers. Indeed **implicitly with constraints**: you have an implicit trigger. Triggers can be **specified on table** or foreign tables.
+
+Each time you **change something** (row, table, ...) and you need to execute a function. You do what you need to do - your action - and inform Postgres what to do - with the trigger -.
+In order to have a trigger you need a **trigger definition**. **Triggers are powerful**, you can **write really anything**. Powerful **becomes most of the time dangerous**.
+
+A few important elements about triggers:
+
+* the function definition has no parameters.
+* `NEW` and `OLD` variables are exposed in the function and give access to the information that has received the SQL event.
+* trigger functions can be written in many different programming language (supported by postgres). The examples in these slides will be in pgsql
+
+When you write this function: _see Charles slides_. You don't always have both `NEW` and `OLD` variables depending of the event. You need to know about that within your function definition. For instance `INSERT` events will only provide the `NEW` variable with the content of the new inserted row but the `OLD` variable will not be available.
+
+Now we have created a function, we need to tell PostgreSQL each time **something happens** to **call our function**. This is done in the **`CREATE TRIGGER`** statement: by also specifying went to run it **`BEFORE`** or **`AFTER`*** event, **which table**, and then `for each row` or `for each statement`. Needs to be thought for performance (`FOR EACH ROW` can be very resource consuming).
+You can also create a trigger as a **constraint**. So you can defer your trigger until the end of a transaction.
+You use `INSTEAD OF` if you want to create a trigger to replace the normal behavior of postgres event.
+
+Starting with PostgreSQL 10 there is something new in triggers: **transition tables**. Before you could read before each row and for each statement you could not. Now it's possible: you have **`OLDTAB`** and **`NEWTAB`** available as variables of your trigger function!
+
+## Triggers security
+
+There is a privilege you can give on a table called `TRIGGER` which gives the user privilege to create trigger on a table.
+
+The youngest DBAs usually grants all sorts of permissions `GRANT ALL TO`, `GRANT ALL`... you are granting somebody to **create a function on that table /o\ ⚠**. For a bank statement that would be quite dangerous. **So please be careful while granting accesses to tables.**
+
+If someone has the right to `insert`, `delete`, `update` he has the **implicitly right to write a trigger function**. There are additional restrictions that apply however: the user **doesn't have the rights** on the **execution** of the trigger function. E.g. of a trigger on a first table which writes in another table. If your user has only access to the first table then it will throw an `ERROR` telling you the user doesn't have the rights to write to that other table.
+
+## Managing triggers
+
+Not very much you can do about them. You can **rename it**. You can **make it depend on extensions**. You can **drop it** (for updating it for example).
+
+Real changes are in the trigger function body. You can also **disable a trigger**. The good thing about triggers is that even **superusers might be disallowed** to do something with specific triggers.
+
+Give them **a name**. check your indexes, constraint creates a system trigger which might need special rights.
+
+E.G. a company wants you to understand what a database is doing. Look at the schema, tables, functions... But are there any **active triggers** in place? To inspect that info you can select: `FROM pg_catalog.pg_class c` table which has a field `c.relhastriggers`.
+
+Then `FROM information_schema.triggers` you get trigger names with there corresponding attached table.
+
+**⚠ the trigger name != trigger function**. the unicity of a trigger is **TABLE NAME + TRIGGER NAME**.
+
+you can use the same function for different triggers. Which triggers are using which functions then? If you modify a function you might change the behaviour of lots of tables... So you need to check where the function is used. How do we check that? `FROM pg_catalog.pg_trigger` (see slides) **list all triggers that uses a certain function.**
+
+You can also check which triggers has a table. With psql `\d public.mytable`.
+
+Now, how do we find out what a function looks like to understand what it is doing? `SELECT pg_get_functiondef(func_oid)` will give you the body of the function. You need to know how to retrieve that if you are working with triggers and functions.
+
+This was the theoric part of this presentation, now let's look at real life.
+
+## Use Cases
+
+Where to use triggers?
+
+* Keeping **track of changes**
+  * history
+  * audit
+
+  **Difference between the two?** E.g. records the number of employees a company received responses on questionnaires. Between 2-3 changes, but the most important is the last response. You don't need to keep track of everything between the changes.
+
+* Create additional **related entries**. E.g. create a new employee, at the **same time** you need to create a new entry in wages / assurances or whatever.
+* **Protect data**. In the US world might be prohibited right now but it was a pain in the ass.
+
+## Don't forget
+
+Something to consider: the **order of triggers**. If you have many triggers. If you need multiple triggers take **very much care** on how they are ordered. You have the timing info (`before`/`after`) for that + triggers are **ordered alphabeticaly by name**. The data passed between triggers follows this order. You can check the order of your triggers with `FROM information_schema.triggers` on the `action_timing` field.
+
+**Pitfall:** change type of a column on the table (by forgetting a potential trigger which could also writes in that table). Then the trigger will fail because of the **type change** on the table and NO changes were made in the trigger function body... Good thing about that is PostgreSQL will tell you where the error is.
+
+**Triggers are efficient way to make things.**
+
+## Real life example
+
+Economic indicators calculated by triggers.
+
+At the begin: data in this table only if somebody answered the questionnaire. _Wait but can we make detailed data without the names of people answering?_
+
+We did it but it was bad for performance. Survey data comes from paper / questionnaire doesn't go directly in the DB. It most be scanned, verified. It's entered in a table which has a trigger to send the data to the `survey_data` table.
+
+Introduce new empty records (for anonymising names). Then we had to change the trigger. With the old system we only inserted data. With the new system we create empty records: we thus need to update them.
+
+So fare so good. But something strange happens. We realised the data **from the past had changed**...! Obviously we restored the data to investigate. So we added a "protection trigger". Creating a trigger that doesn't allow a trigger to change "past" data. PostgreSQL now gives us information of where the error comes from. In the function body of the trigger we noticed that we **forgot to filter** on the **YEAR** and **MONTH**. So we now have a trigger that helps us to find errors inside our trigger function. _inception..._
+
+On internet you can find lots of people complaining about triggers. Well the problem is **not triggers** but **function code**!
+
+Manage histories with **foreign data wrappers** (in order to avoid the "local" audit) so you have your audit in a different database for example. And comply in every legal requirement.
+
+## TL; DR
+
+* **Easy to use** triggers and write function for it. in less than 5 minutes.
+* Easy and **has powers**: danger. **Be careful** with that.
+* Need triggers for very special things: for example **modifying data** (format) or **protecting data**.
+* Make **extensive tests**. Our problem: "we want it and we want it now". We tested it yes... but you need to make tests with **real data** not only a small subset of fake data.
+* Obviously, **make a backup** of your data before adding triggers :)
+* The **order of triggers** is important!
+* If you generate **error messages: make them clear** for future-you or your colleagues/friends.
+* Last but not least: **document your triggers**. You can document your objects inside PostgreSQL with `COMMENT ON TRIGGER` so document it in your wiki but put a comment directly in your database too.
+
+I wanted to give you an idea of what you can do: they are good and can do helpful things but be careful they can be dangerous. :)
+
+## Questions
+
+**Q.** Are executions of triggers shown in explain?
+
+**A.** You will not see triggers in the query planner explain. However within your triggers' body function you can add `EXPLAIN`s if you need to debug.
+
+**Q.** Regarding Audit of database: How to check if an external trigger is affecting a table?
+
+**A.** Short answer: you can't know. Long answer: you can add triggers and monitor the events on your table: e.g. allow only inserts if the table only receive inserts. Usually you know **who** is supposed to be able to write in a database. Indeed you need to **specify users** to use a FDW, so you can see if it is an "internal" user or an "external" one.
+
+**Q.** How do you do testing in PostgreSQL functions?
+
+**A.** Take an initial state, run the trigger with different scenarios and check the output is correct. I don't know any specific tools but there must be some. It's an interesting subject that probably needs a complete separate talk :D
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# Change Data Capture for a brave new world
+
+**Hannu Valtonen** - **[@HannuValtonen](https://twitter.com/@HannuValtonen)**
+
+Going through different ways to capture data.
+
+I am co-founder of Aiven managing databases in the cloud.
+
+PostgreSQL side: maintainer of some PG tools: pghoard and pglookout and pgmemcache.
+
+_wikipedia definition_
+
+>
+In databases, change data capture (CDC) is a set of software design patterns used to determine (and track) the data that has changed so that action can be taken using the changed data. Also, Change data capture (CDC) is an approach to data integration that is based on the identification, capture and delivery of the changes made to enterprise data sources.
+
+Why do you want to do CDC? Typically when you **sort something** in your database, it is usually just the beginning of the journey. Realtime change of an information is what we try to get. **Historic models**. Main idea is to **get deltas** rather than having snapshots in different warehouse.
+
+Examples based on a table with a PKEY and `created` and `updated` timestamps.
+
+## CDC in the age of dinosaurs
+
+* When people had data warehouses: nightly dumps of databases and combine them in a nightly job. That's dinosaurs: if your data doesn't change a lot it's a lot of waste (network / space ...).
+* PosgreSQL `copy` command made it much better (you can choose what you need by table / by database)
+* So how to figure out what has changed? People has been using an "updated timestamp" field. You could also use a PKEY. But that **is horrendously bad performance** but it was actually doing the job.
+* diff **naive implementation**: tracking inserts and updates.
+
+## Then the trigger base approach arrived
+
+So for everything you did (every postgres event) a trigger would keep track of that in a diff `changed` table which could be read for that.
+
+* e.g. slony and londiste for replication
+* **good:** allows all DML (events) to be extracted
+* **cons:** bad performance doubling all writes... difficult in large scale...
+* **None** of this **handled DDL** quite well. If you added a new column that didn't get noticed.
+
+Slony is really old.
+
+## CDC - the new age
+
+Logical decoding got introduced.
+
+Allows you to capture all changes without doing the "doubling" actions of triggers.
+
+### CDC - Logical decoding What can it do?
+
+* track all DML changes
+* use cases: auditing, replication, lots of use cases
+* Logical replication: many language drivers JDBC driver, Python psycopg2...
+
+### can't dos?
+
+* Lack of DDL support: Create a new table won't be catch by logical decoding... **again**
+* Check changes
+* operational constraints (if a primary goes down)
+* A database cluster of 100 databases: you'll need to check 100s' of streams. A logical stream is always tied to a logical database.
+
+### How to set it up?
+
+* `wal_level = logical`
+* Need a role with replication privileges. PostgreSQL will keep track of what has been read from the database until the data is fully written on disk.
+* Before PostgreSQL 10 you needed a change in the `pg_hba.conf`.
+
+### Extensible: plugins. E.g. wal2json
+
+Turn changes into a **simple json object** with `wal2json`. Really strict data type supported because of JSON limitation data types. But supported by DBaas vendors (AWS, AIven)
+
+## CDC- Another approach
+
+Running postgresql and receive all logical changes with `pg_recvlogical`. Uou can connect to a database and receive all changes with that.
+
+**Cons:** single binary receiving all the changes.
+
+### Example usage of pg_recvlogical and wal2json
+
+_See slides_
+
+### Example of wal2json python replication example
+
+_See slides_
+
+## CDC - Third approach: Streaming platform for your data
+
+* E.g. **apache kafka**. When your needs are not that simple.
+* Downside of that is that it is **really complex**: distributed streaming platform
+* Managing this is considerable
+* Netflix said a few days ago they managed 4000 kafka servers. /o\
+
+### Apache Kafka
+
+* Allows you to publish content into topics
+* you can subscribe to topics to read messages
+* You can re-read data at will (!= of message queuing system)
+* Data stored contains a key, allows you to make the value unique (per key)
+* freely choose the value (binary for example)
+* It doesn't really care what kind of data you store. It could be anything
+* AWS kinesis *aaS
+
+### Kafka continued
+
+* data within a partition is guaranteed to keep order.
+* Neat thing: you can have a kafka topic that is related to a table that you have. so PKEY of PostgreSQL == key in your Kafka topic. So you could have all the PosgreSQL table in a kafka topic
+* If your data doesn't have a key. You can attach a retention policy (time, space retention policy...)
+* Authorise to write the data once, and read as many times as you want.
+
+### Debezium plugin for kafka
+
+Allows you to read any changes made in PostgreSQL into kafka. It makes it trivial to move all changes made in your PostgreSQL database into kafka. Once you have the data in kafka you can do as many transformations as you want on the data received.
+
+## Another approach : builtin logical replication
+
+_(postgres 10 and +)_
+
+* Replicate only a specific set of changes. E.g. only replicate inserts done in table X
+* Easily realtime builtin replication of subset of data
+* In future version: replicating to new postgresql versions
+* It's builtin to core!
+
+### limitations:
+
+* lots of database in your cluster. You need to setup replication for **EACH database** in your cluster
+* Slight bummer: **requires superuser**.
+* AWS DMS common use case too.
+* Switching between vendors: **no downtime migrations**
+
+### How it works?
+
+* Setup publications
+* Receiving side: create a subscription. It will then start replicating.
+* It's **as simple as this**.
+
+### TL;DR on logical decoding
+
+Revolutionising CDC! It is only gonna get better. Still needs some improvements (in failovers scenarios). There are still **sharp edges** on it **but it is promising**!
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# Herd of Containers
+
+**Saâd Dif**
+
+**DBa at BlaBlacar** since 2yrs ago. In a team of 15 people building/maintaining infra. My main focus databases mysql and postgresql.
+
+Subject: **containers**. How we handle it in blablacar.
+
+Blablacar: Car-pooling company. 22 countries. More travellers than British Airways.
+
+**Core data ecosystem**. Handle databases for production system and also a dedicated team for data analysis
+
+* Run a mysql cluster with mariaDB and Galera cluster, multi-master databases
+* Cassandra, column oriented database
+* Redis, key-value datastore very fast very robust, stores everything in memory and optional durability. Counter, Cache...
+* ElasticSearch: search engine
+* PostgreSQL extensibility and stability purposes.
+
+## Why containers?
+
+Old time: we were using Chef as configuration management tool in our own self-hosted servers. We had the ability to provide more than one service on one host but couldn't isolate them easily.
+
+We decided to stay on-premises. We decided to go with `rkt` for the container engine (rather than Docker). Hosts are working with **CoreOS container linux**. Dedicated OS simple and stable distribution which sole purpose is to run containers.
+
+To orchestrate those containers we dedcided to go with `fleet` (comes with CoreOS). Our own systemd units generation tools. We build containers with a home-made blablacar tool to build and configure App Container Images. We use "pods" are env where images are aggregated sharing the same resource.
+
+On top of `fleet` we have an `etcd` cluster.
+
+## Service discovery
+
+DNS not very modern. We needed something instant. So we went for `Zookeeper` + a home-made [`Go-Nerve`](https://github.com/blablacar/go-nerve) (re-written from an [AirBnb tool](https://github.com/airbnb/nerve)) binary that subscribes a container to zookeeper. For discovering we have a similar home made tool (re-written [airbnb tool](https://github.com/airbnb/synapse/)) [Go-Synapse](https://github.com/blablacar/go-synapse).
+
+Go-nerve performs health checks (tcp, sql, ...) and reports those checks to zookeeper. On client side Go-synapse will check a certain path (for example /database) in zookepeper and reloads HA-proxy configuration.
+
+## PostgreSQL usage at blablacar
+
+* Third party apps where PostgreSQL is a prerequisite
+* Home made tools needing specific PostgreSQL features
+* Mainly for spatial data (PostGIS extension)
+
+For example we have a project called `corridoring`, e.g; Paris to Bourges you need to travel through Orleans. Better filling up of cars to detect those cities in the middle of routes.
+
+Not only "main routes". E.g. Rambouillet - Le Creusot != Paris - Lyon.
+
+Avg 50k reads per minutes.
+
+## How to operate our PostgreSQL cluster?
+
+We used to use streaming replication for disaster recovery and to distribute reads. With Manual interventions. **Not that friendly**. Painful failover recovery. We wanted to change for that.
+
+Our target was to **scale writes**, **ease deployments**, **maximum availability** and have the feeling of expandable resources. **Get rid of secondaries and failovers.**
+
+Looking at possibilities: postgres-X2 seemed abandoned, postgres-xl looked too heavy or complex for us as it needs coordinator nodes, PgLogical but could not provide multiple-primary, bucardo, slony, londiste logical streaming systems but manages the replication in triggers which we didn't want.
+
+Mainly the two solutions are: physical replication or logical replication.
+
+## Switching to a new implementation
+
+→ `BDR` Bi-directional replication. Logical replication. You can have from 2 to 48 nodes (writes or reads), optimal for Geo distributed databases.
+
+Why we confirmed this solution? Both nodes can handle reads or writes. No more failovers. No other processes needed than PostgreSQL. Partition tolerant. **Very robust solution** that we choose.
+
+## Caveats:
+
+* modified version of PostgreSQL **9.4**
+* **Replication lag** but ok for our spatial use case
+* **Conflicts**. Update same row in two different nodes: you have some problems. By default BDR has a conflict system that uses the **"last" write** but you can extend this decision
+* **DDL locks**. Will wait all nodes have the same point in time, but if you have replication lag in this case it will **lock every change on this table**.
+* Statement not replicated When you want to create a new user for example
+* Other features not supported yet: change ownership of objects
+
+## Implementation
+
+We configure containers just before they start. Check if there are already similarly configured node in the service.
+
+We use a "donor" attribute to see if a BDR group already exists or not.
+
+Node connects to the "donor" group to:
+
+* retrieve user definition on donor
+* join BDR group
+* create minimum objects
+
+What happens on start? Basically will pull an available backup before following replicaion.
+
+## Monitoring alerting
+
+* prometheus, time based datastore that handles metric
+* we use an exporter to expose metrics. Different process on PostgreSQL pod to expose metrics
+* Grafana to make dashboard for those metrics
+* PagerDutry used for alert purposes
+
+## Dashboards
+
+Most common metrics we exposes on dashboards are:
+
+* check number of connections and status of connections
+* check number of reads and writes
+* check block reads
+* check lag between nodes
+
+## Particularities with BDR
+
+* enhance the exporter for more metrics.
+* extended PostgreSQL metrics
+
+## Backup recover
+
+* no physical backups
+* only logical backups with pg_dump
+* with BDR no solution for backup & recovery by default so you need to create a new BDR cluster. We thus went for logical backups
+* File with structure definition and the file with data. We retrieve the two files, we parse them and change to remove incompatible definition with BDR. Load structure file and data file and 🎉.
+* we gather metrics during backup process to be able to display dashboards of last backups / missing backups
+
+## Feedback on BDR
+
+We are **very satisfied for availability purposes**. More than a 1 yr, no outages yet. Very reactive community. Check [their github](https://github.com/2ndQuadrant/bdr)!
+
+You need to know what your needs are: it is **not suitable for everyone**.
+
+For sanity checks, we had to write our **own checks** to know the **status of our cluster**.
+
+Enthusiast about the new version of BDR coming this Year. Compatibility with newer version of PostgreSQL (only 9.4 for now)
+
+## What's next?
+
+In our cases:
+
+* want to give ownership to production to our developers' teams. Use correct tools and spread the knowledge.
+* Fleet is deprecated. We need to migrate to `Kubernetes`. What if we switch our container engine? From `rkt` to `docker`? It will probably be better for us due to the big docker community. We also want to be cloud agnostic. For now still on-premise.
+
+## Questions?
+
+**Q.** Why not PGlogical instead of BDR?
+
+**A.** With BDR we can have 2 to 48 nodes that handles writes OR reads. Not possible with pglogical.
+
+**Q.** How do you handle HA at the storage level?
+
+**A.** All our servers have "local" storage. If a new container run on the same node it will use the local storage. If not it will join the cluster as a new "node" and will thus need a bit of time to be recreated.
+
+**Q.** What is your DB size? How many time does it take to spawn a new container?
+
+**A.** 100go, A few minutes in the same datacenter. In other datacenter 10-20 minutes.
+
+**Q.** Did you observe IO overhead with containers?
+
+**A.** Yes a bit of overhead, but not so much. It's transparent for us.
+
+_Write availability for pglogical is possible (BDR uses pglogical under the hood)_
+
+**Q.** Lots of changes on the app to handle conflicts?
+
+**A.** With HA-proxy, we can decide which nodes will receive the traffic. At blablacar most apps send traffic to only one master
+
+**Q.** How many nodes (max) did you scale up to?
+
+**A.** Max 5 nodes. And we have 5 diff apps that uses BDR.
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# A look at the Elephants trunk for PostgreSQL 11
+
+**Magnus Hagander** - **[@magnushagander](https://twitter.com/@magnushagander)** - [📝 See slides of the presentation](https://www.hagander.net/talks/PostgreSQL_11.pdf)
+
+PostgreSQL 11 **doesn't exist** (yet at the time of speaking). So this is just gonna be fiction :) **more or less fiction**.
+
+Are you running PostgreSQL 11 in production? I'm am on my blog :).
+
+I work for Redpill Linpro a Scandinavian open source consultant company.
+
+I am a PostgreSQL member of the **core team**. One of the **committers**. On the **board of PostgreSQL Europe**.
+
+## PostgreSQL 11
+
+* not done yet, pretty far from being done
+* feature set pretty unclear for now
+* we don't know how many of the **included things will be removed**
+* we don't know how many of the **reviewed things will be added**
+* at this stage of the dev it's pretty normal
+
+## Development schedule
+
+* August 2017 v10
+* September 2017 CF1 (CommitFest)
+* Commit Fests: 4 before a release. Last one is usually longer than the others.
+* Right now we are in the march commit fest. it's the last commit fest for PG11 and should end ~ April 2018
+* **Target** release date: **September 2018**
+
+## What will we be included?
+
+Divided into 4 different topics
+
+* DBA oriented
+* SQL / Dev oriented
+* backup and repli
+* performance
+
+## DBA side
+
+PostgreSQL 10 added SCRAM auth (better than MD5 password auth) well now: SCRAM channel binding.
+
+**Configure the size of WAL segment** WITHOUT recompiling postgres. Default still 16mb. If you have a very high generation of archive commands. If you use PostgreSQL in a really limited resource environment.
+
+pg_stat_statements' `queryid` is **now 64-bit** (instead of 32-bit) much less collision risk. If you are snapshoting this data, you'll need more data size because doubling the size now.
+
+`SET STATISTICS` now has support for **expression index**. Was column based, now instead we can put it on **an index multi-column expression**
+
+🔥 `pg_prewarm` background worker at regular interval will dump what is in your buffer cache (default every 5 minutes). On startup of PostgreSQL, will check this list and preload that cache to get closer to a running node. \o/
+
+## SQL / Development side
+
+Support for `SHA-2` for example in some environment you are not allowed to use MD5 that's nice you'll have another hash algorithm and not just md5! PostgreSQL had these functions since a long time, it was just not exposed in SQL.
+
+Some limitation have been lifted:
+* **Arrays over domains**
+* **domains over composite types**, so you can create a domain on a composite data type now (not only basic type)
+
+**Full SQL2011 support**: **range of WINDOW**. Window frame clauses. What does it mean? We can now say that we want to aggregate over a "range of value".
+Other thing that we can do with that: add an exclusion eg. `EXCLUDE CURRENT ROW`
+
+We actually have **stored procedures** now. We had stored functions and stored functions that return void. Buuut it's not exactly a stored procedure. Stored procedures gives us **transaction control**. And we can do `begin` and `rollback` **inside** a procedure (not possible in a function).
+
+## Backup and replication
+
+Every PostgreSQL release has added _something_ to replication. PostgreSQL 11 doesn't really add something major.
+
+**Advance replication slots**. API function that lets you **move a replication slot** without consuming the data. It will help to keep slots in sync across nodes. Will be usefull for software such as RepMgr not especially designed to be used by itself.
+
+## Performance
+
+Lots of interesting things happening in PostgreSQL 11 in perf improvements.
+
+Parallelism:
+
+* 9.6 parallel queries
+* 10 made paralelism useful: by automating it.
+* 11 even better! Bunch of enhancements, **read data from two places**. **Paralelism on hash joins**.
+
+You will be able to have a **parallel index creation**! For now only works for B-tree indexes. New param: `max_parallel_mainteance_workers = 2`
+
+Another big thing from PG10 **declarative partitioning**. **Added syntax** easier to work with.
+
+Main thing was infrastructure for PG11:
+
+* now have the ability to set a *default* partition
+* Allow `UPDATE`s to move rows. You can thus change the value of the partition key!
+* It does a delete/insert for you. You might have a concurrent lock and end up with an error but that's something else.
+
+**Local partitioned indexed**. Create index on the **master table** will now be **replicated** on the **child tables** \o/.
+
+You can now create a unique constraint on the master table and it will create the contraint on the child partitions!
+
+PostgreSQL 11 adds **Hash partitioning**. Partition by hash value. (doesn't work with constraint exclusion)
+
+**Partition wise join**. If you are joining two different table partitions on the _same_ partition key. It's not enabled by default right now. There's a cost on doing this though.
+
+## Misc
+
+Commit Fest 4 is not half way through. 100s patches sitting in the queue.
+
+**If you want to review patch's. Please do it :)**
+
+A small list of not reviewed patches:
+
+- serialisable parallel query
+- patches around **SQL/json**. pg json is no way near the standard.
+- support **merge syntax** patch. Very big thing.
+- partition wise aggregates. **Sum across multiple partitions** for example. More about the system knowing what partitioning is.
+- **partition pruning**. For the system to know whether it needs to check a partition or not. In the query planner it needs to plan if it will visit a partition or not. If it doesn't know it will read them all.
+- patch for **foreign keys** on **partition tables**.
+- **foreign key arrays** patch. to combine fkey with arrays.
+- alter table add column **default** **FAST** add a default value when adding a column!!
+- **join clause on ranges**
+- **JIT compiled expressions** and tuple deformimg. It could massively improve performance. (0 changes on syntax/ inputs, really infrastructure improvement)
+- exclude unlogged tables for admin side.
+- **page level checksums** checking and verifications. Earlier you find data corruption's the better it is for you
+- chained transactions, no gap in between transactions.
+- 170 more....
+- always more, small fixes, perf improvements...
+
+**Please help!** Needs you, needs more people for patch review and patch testing, reviewing that the documentation actually matches the patch.
+
+Outside the CF, **download and test PG11 apt packages** exists. Nightly dev snapshots. They may not work but **try them in continuous integration testing environments around your application!
+
+### Questions
+
+**Q.** Are there `brew` packages of dev nightlies?
+
+**A.** I don't think so.
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+# Lightning talks
+
+## Marco Slot - Citus Data
+
+Extensions to make a distributed geospatial database?
+
+**Combine extensions** for the win. Let's try to combine them.
+
+What would I get ?
+
+**Pg10** + **postgis** + **pg_partman** + **citus**: worked pretty well!
+
+Postgis to add your spatial data types, Pg_partman for autos partitioning with one function call. Can drop / create partitions for you. Citus can help sharding.
+
+Sharded by one dimension and partitioned by time with those two extensions.
+
+Select scans 30 million rows/sec.
+
+Its great to be able to combine extensions and make a fully functioning app quickly.
+
+## Stéphane Schildknecht - CEO Loxodata - DBA Appreciation day
+
+A DBA usually works in the dark. In the shadow. Some people doesn't understand what they are doing. If something goes wrong its the fault of the DBA or the database.
+
+You are the person who knows the business but no one **really knows that**. Others think you just sit there having things to do. But you know you are trying to make your business more secure and more reliable. Let's introduced a dedicated day for DBAs!
+
+[#dbaday]() [dbaday.org](http://dbaday.org) **6th July 2018**
+
+## Louise and laeticia - Postgres Woman
+
+Creating an **association** to promote the **place of women** in database / postgresql community. **We exist I assure you**. 25% of jobs in tech are held by woman. We want to change the postgres community to reach this amount (last **PostgreSQL conf EU got only 5% of woman**..)
+
+Woman will be welcome, don't be shy we wouldd like to promote what you are doing.
+
+Twitter account : [@postgresWomen](https://twitter.com/postgreswomen)
+
+Dedicated ML. Wiki page for now.
+
+You are a man? **We need you too to help promote this community!**
+
+[↑ Back to the list of talks](#talks)
+
+---
+
+That's all for now! Thanks for reading until here and have fun with 🐘 PostgreSQL 🐘 
