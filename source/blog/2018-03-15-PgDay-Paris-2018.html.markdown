@@ -7,6 +7,8 @@ skip_to_link: { talks: "Skip directly to the talks transcripts 📝" }
 
 Once again this year the great staff of pgDay Paris did it all. We had a very good **pgDay Paris 2018** edition. A great location in the center of Paris near Beaubourg. A diverse and interesting line-up. And as usual, a **joyful community**.
 
+READMORE
+
 ## Talks
 
 _Morning_
