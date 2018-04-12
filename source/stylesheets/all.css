@@ -69,7 +69,6 @@ article pre code {
 article .date {
   margin: 20px auto 10px; }
 article :not(pre) code {
-  color: rgb(18, 43, 59);
   background-color: rgba(18, 43, 59, .1);
   padding: 1px 2px;
 }
