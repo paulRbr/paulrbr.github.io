@@ -30,6 +30,7 @@ page '/*.txt', layout: false
 # Renderers
 ###
 require "lib/renderers.rb"
+set :renderer, AnchorHeaderRenderer
 
 ###
 # Helpers

@@ -19,5 +19,7 @@ gem 'font-awesome-middleman'
 gem "middleman-disqus"
 # Color syntax
 gem "middleman-syntax"
+# Org mode parser
+gem "org-ruby"
 
 gem "pry", group: :development

@@ -1,6 +1,6 @@
 require "middleman-core/renderers/kramdown"
 
-class ::Middleman::Renderers::MiddlemanKramdownHTML
+class AnchorHeaderRenderer < Middleman::Renderers::MiddlemanKramdownHTML
   def convert_header(el, indent)
     attr = el.attr.dup
     if @options[:auto_ids] && !attr['id']
