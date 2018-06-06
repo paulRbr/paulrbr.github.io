@@ -1,0 +1,1086 @@
+---
+title: DotScale 2018 (Yet Another Conference Blogpost 🙈)
+date: 2018-06-01
+tags: conference, dotscale, Paris, people
+skip_to_link: { talks: "Skip directly to the talks transcripts 📝" }
+---
+
+Once again the [[https://www.dotconferences.com/][DotConferences]] team organised a really nice one-day one-track conference in Paris. Thanks a lot to them, to the speakers and the audience.
+[[https://www.dotscale.io/][DotScale]] 2018 was a very fine edition!
+
+They managed to have very nice and experienced speakers, from diverse backgrounds (academic, industry, tech advocates) and with various subjects.  It was my fifth DotConference since I live in Paris! Wow time flies by.
+
+You will find below a few notes of the day if you want to have a general idea of what happened there.
+
+/If you prefer to watch the complete talks, videos should be [[https://www.youtube.com/user/dotconferences/playlists][made available from the DotConferences team]]./
+
+READMORE
+
+#+HTML: <a id="talks-list" />
+* Single day - Single Track
+
+- [[#istio][ *David Gageot* - Istio, We have a problem!]]
+- [[#data-cartography][ *Preeti Vaidya* - Data Cartography: scaling the data landscape]]
+- [[#distributions-package][ *Lucas Nussbaum* - Distributions and package management in the containers era]]
+- [[#monitoring-at-scale][ *Damien Tournoud* - Monitoring infra at scale]]
+
+
+- [[#lightning][☇ *Lightning* ☇]]
+
+
+- [[#observability][ *Willy Tarreau* - Observability tips for HAproxy]]
+- [[#demonstrate-arch-ready][ *Julio Faerman* - How to demonstrate our architecture are ready?]]
+- [[#data-pipeline][ *Yaroslav Tkachenko* - Data-pipeline @Activision]]
+- [[#just-right-consistency][ *Marc Shapiro* - Just Right Consistency]]
+- *[[#kubernetes-101][Bridget Kromhout* - Kubernetes 101]]
+- [[#scale-is-hard][ *Paul Dix* - At Scale everything is Hard]]
+- [[#infra-data][ *Jeremy Edberg* - Infrastructure Data]]
+
+#+HTML: <h2 id="talks"><a href="#talks" class="anchor"><i class="fa fa-link"></i></a>Talks</h2>
+
+#+HTML: <a id="istio" />
+* Istio, We have a problem!
+
+  *David Gageot* - *[[https://github.com/dgageot][@dgageot]]*
+
+  Istio is a set of components on top of Kubernetes to build a service mesh.
+
+** The Setup
+
+   What am I trying to achieve? Web developer building a simple app. Quiz website to find which image matches the description.
+   Based on micro-services.
+
+   I am going to deploy the app using a tool called [[https://github.com/GoogleContainerTools/skaffold][skaffold]] (build, tag and deployment tool to watch local directory)
+
+   The app seems to work sometimes and sometimes it's broken. ¯\\under{}(ツ)\under{}/¯
+
+   5 micro services (yes it's crazy for this app). *Houston we got a problem.*
+
+   What is happening? *I don't know...*
+
+   /If only we had distributed traces, if only we had visibility.../
+
+
+** One solution: Istio "Service Mesh"
+
+   Showing the flow of a user request via:
+   * the ingress (K8s' main public entry point/LB)
+   * then through an "envoy" container (a kind of proxy) in front of my containers (inside the same pod)
+   * finally to my container.
+
+
+   Istio knows what is happening in my micro services world. You can thus show a graph showing the relationships between them with a graphviz visualisation. That's cool and "for free".
+
+   Istio captures all traffic between services. It knows which endpoints are called, it knows their versions, it knows the http response time, response codes etc... All captured via prometheus and displayed in Grafana.
+
+   Istio installed on your cluster shows the global status of your micro-services platform.
+
+   /David showcasing/ the metrics from each services aggregated in one graph: some services are not always responding with a correct http response code.
+
+   /David Showcasing/ the tracing system via [[https://zipkin.io/][Zipkin]]. We can see that some requests have ugly traces (25 requests to a single service in loop it seems)
+
+   There's *a bug in that service*! Let's Fix It! Yeh and ship it!
+
+   Solution seems good for one user but seems broken for others.. When you fix something you always brake something else...! right?
+
+   /David showcasing/ again the [[https://grafana.com/][Grafana]] dashboards with the TWO versions of the code to see if it seems to fix the problem.
+
+   Let's move all our users now that we see that it works!! Maybe not.
+
+   With istio you can move only a percentage of your traffic.
+
+** Sum up
+   
+   * Add visibility to your system.
+   * Add tracing to your micro services.
+   * Deploy with more confidence.
+   * Thanks Istio!
+
+** Q/A
+*** When will it be production ready?
+    Not yet, but V0.8 was out this morning! Healthier version ever
+*** Other use cases
+    Adds security to your system (adds TLS layer in front of every micro-service).
+    Another nice feature: Hybrid setup on-prem + cloud.
+*** What are you working on personally right now?
+    Working on Skaffold to make developers happy on Kubernetes.
+*** When will that be GA?
+    It's open source halo, don't know yet :p
+
+
+
+#+HTML: <a id="data-cartography" />
+
+[[#talks-list][↑ Back to the list of talks]]
+* Data Cartography: scaling the data landscape
+
+  Preeti Vaidya
+
+  Most important part of your app/solutions trying to build. *Data* is the key element of the things we build right?
+  With data stores, cloud computing, data visualisation... It's becoming really difficult to decide what to choose?
+  *What data storage should I choose?*
+  *What data visualisation tool?*
+
+  This talk should help you to choose!
+
+** Data is dynamic
+
+   That's because human activity are dynamic!
+
+   How did I arrive here? NY → Amsterdam → Budapest ..... →  Paris
+
+   *Spoke-hub model* routing. Planing routes used in aviation. It's also used in Healthcare. Also used in content marketing.
+
+   Trying to map human events where people are doing certain actions.
+
+** What is a data model?
+
+   It's just an *abstraction of your data*. In order to fit in any *new* data in that data model.
+
+   E.g. with openflights.org How can we store this data?
+
+   First thing that comes to our mind: let's use a relational model for this. Why do we need to go beyond this?
+   BUT now you have a K/V store, a doc store, a graph store...
+
+** What DB do we choose?
+
+   Based on the e.g. of openflights.org if we try to visualise the data we can see some "hubs" appear. For example a certain city is routing lots of plane journeys.
+   So what can be used is a *graph database*. Node which is our hub, edges which are our spokes. Possibly we can input our data in that data model. Graph first.
+   Joins on this won't be so computationally expensive because it's designed to be easy to do.
+
+   E.g. debian packages as graph databases.
+
+   Two types of graph databases: native and non native.
+   * Building a graph database with a normal relational database with indexing (non-native graph database) performance being enabled by indexes' computation from the data store.
+   * Native graph databases. Graph based database. So algorithm inside the database are done *for graphs*.
+
+** Data apps are dynamic too
+
+   If we decided to go today to another place all of us together. Let's see if a graph db would help us achieve that.
+
+   Our problem is now completely different: we need to find *a consensus* between all of us... Which will not be solved by a graph db.
+   →  *Byzantine generals problem*. We want to agree on which place we would go.
+
+   A data model which solves this effectively is a *Hashgraph data model*. The hashgraph would propagate the information via neighbours. Eventually we would know which city gets more votes.
+   Might be a good solution but then we would need to buy the tickets right?
+
+   So how could we do that? Maybe using a blockchain? Moving from our *application* to our *operation*. *The operation that we are doing with our data*.
+
+** Data operations are dynamic!
+
+** Top-down analysis
+
+   What data operation we want to do *first*. Then *the application*. Then *the data model* and finally the *data store*!
+
+
+** Sum-up
+
+   If we analyse first we would have the best data store for *our solution*. Don't choose your data store first, think about your *data usage before*!
+
+** Q/A
+
+*** How to put in practise this?
+
+    Taking relational data and put them together in one place. Think about the operations: enable people to do data analysis for certain products.
+
+*** Book coming up? Tell us about it please :)
+
+    Bringing agility to data products. Data is a competitive advantage. It becomes important to do quicker analysis from your data.
+    Move away from application design, to data product design.
+
+*** Release of the book?
+
+    Soon hopefully :)
+
+** Thanks!
+
+
+#+HTML: <a id="distributions-package" />
+
+[[#talks-list][↑ Back to the list of talks]]
+* Distributions and package mngt in the containers era
+
+  Lucas Nussbaum - [[https://twitter.com/lucasnussbaum][@lucasnussbaum]]
+
+  University of Loraine, Debian project leader
+
+  Distributions are not hype anymore.
+
+  FOSDEM 2017: 4 dev rooms for distributions
+
+  FOSDEM 2018: only 1!
+
+** Hype?
+
+   Everybody talking about it nobody using it VS everybody using it but nobody talking about it
+
+** Looking at failures of Distributions
+
+   How to distribute Linux Kernel, Gnome, GNU projects, Haproxy to end users?
+
+** Success: Universal package format
+
+   Most important thing about free open source software!
+
+   That's thanks to a complex tool chain.
+
+   Debian leverage the language package managers (gems, pypy, npm, hackage...whatever). We can easily convert custom lang packages into debian packages. ([[https://wiki.debian.org/AutomaticPackagingTools][wiki.debian.org/AutomaticPackagingTools]])
+
+** Success: Consistent quality
+
+   Many QA tools.
+   - static analysers for packages
+   - Conformance to Debian policies
+   - graph dependencies analysis (old packages tracking)
+   - checking scripts are working (install, updates...)
+   - Leveraging test suites from upstream packages via CI builds + Archive rebuilds!
+
+     Goal is to detect problems as early as possible. /It's the washing machine of the free software world!/
+
+     Also needs to check licensing issues, builds systems....
+
+** Success: Distributions have ecosystem
+
+   Derivative of distributions: Ubuntu. Derivative distributions also has derivative distributions: Linux Mint
+
+** Failures: lack of collaboration
+
+   Problems/Issues should flow "back" to upstream projects. Due to derivatives and complex distribution graph sometimes it doesn't come back all the way to the upstream packages.
+
+   Unclear status of distributions' bug tracking systems.
+
+   Duplication info between all bug trackers between distributions and upstream packages.
+
+   In Debian issue tracking system bugs are not only "open/close" they are known as "fixed or found". (For Multiple versions packages per distribution version)
+
+   Launchpad addresses the same Debian package management within Ubuntu packaging.
+
+   *Should we have a federation of bug trackers?*
+
+** Failures: usually not the software you want
+
+   Not the right version
+   Not the right package
+
+   E.g. with containers
+   - base distribution packages
+   - custom versions of distributions packages
+   - Application
+   - Application dependencies
+   - lots of fragile code to hold everything together
+
+     What about managing apps *and* their deps with deb packages?
+
+     Using the same (mature) tool for everything.
+     Bridge the gap between Ops and Devs.
+
+     And it helps *even if you use containers*!
+
+** Solution: one big bundle
+
+   E.g. for ruby with bundler+gem2deb
+
+   Single big deb package for the two top layers (app + app dependencies). Already done by bundler or virtualenv for example.
+   You can go further to bundle this in a deb package for example. ~gem2deb mygem~!
+
+   E.g.2 [[http://auto.debian.net][auto.debian.net]]
+
+   Design a service that integrates all the tools via QA. To build everything automatically.
+   - Back-ports of Debian branches.
+   - New upstream versions.
+   - language specific packages repos
+   - custom version of package (ppa)
+
+     Integrating all in Debian's usual QA checks
+
+     It's still a work in progress. Hopefully will be able to play with that soon.
+
+** Q/A
+
+*** Tell us more about the Debian project
+
+    Contributors all around the world. Very flat organisation. Some people says it's an anarchist project. Everything is very flat :)
+    One thing that makes it work: the *debian constitution* and *policy documents* + a *social contract*.
+
+    It's not only "make the world a better place" :)
+
+*** Relationship with Canonical and Ubuntu?
+
+    From the outside, people tends to think there's lots of disagreements. But it's not so much the case.
+
+    As we have priority for our users (it's in the Debian policy) that's the most important for us.
+
+    Most of Debian developers going to canonical stayed Debian contributors.
+
+    Of course canonical has their agenda. But they push back their fixes to us most of the time.
+
+*** Advises for Debian contribution? How to get involved
+
+    Do it, it's great! Packaging tutorial mentioned in my talk there's a list of things to get started.
+    You can join a team to help packaging. E.g. go in the ruby team.
+
+
+#+HTML: <a id="monitoring-at-scale" />
+
+[[#talks-list][↑ Back to the list of talks]]
+* Monitoring infra at scale
+
+  Damien Tournoud - [[https://twitter.com/DamZ][@DamZ]] - CTO at Platform.sh
+
+  Monitoring infra that are highly dynamic.
+
+  Understanding, making sense of infrastructures. The more dynamic, the hardest time you'll have to understand it (especially under pressure)
+
+** A step back
+
+   Platform.sh we unify infra to make it "simpler". We are running applications for our clients.
+   We rely on Azure, GCP, AWS... All hosts are divided into containers (we use big host with 500+ containers)
+
+   From the perspective of our clients: we deploy environments. We show a "logical view" as opposed to the "physical view" of our hosts.
+
+   Started small (launched in 2014). Now 15 regions. 8 cloud providers.
+
+** First step
+
+   *Making a model of the components that we have.*
+
+   *Physical view*, with region with zone.
+   *Logical view*, services, envs, project.
+
+   in the middle we have regional services: *impact on multiple customers or regionally located*.
+
+   All this links ~Hosts~ with ~Instances~.
+
+   - Our model made the infra easily *explored*
+   - we can assess impacts pretty easily
+   - the model made aggregations simple and *reasonable*. Easy to make aggregations /how many cores deployed in AWS Japan/.
+
+** Second step
+
+   Pull vs Push for monitoring?
+
+   *For us Push made more sense*.
+
+   Relationship aware push: Parent and child components. This helps to not keep track of "dead" components.
+
+   Alerts from metrics? In practice it's really hard. It's hard to design alerts that are *useful* (low level of false positive/false negatives).
+
+   For us we wanted the model to generate the alerting strategy. The model encapsulates our strategy.
+
+   Our end goal: figuring out how to feed the UI and waking up people at night (via pagerduty).
+   - a set of data sources: hosts, components, infra level metrics. All flows into a single collector which goes to a "state of the world" where we can run queries (or continuous queries)
+   - Alerting system looks at the state of the world.
+   - long term storage (snapshots of our data)
+
+** Recap
+
+   Interesting to focus on *data model first*.
+
+** Q/A
+
+*** Custom database implem for state of the world. How it's done?
+
+    Mainly python and go. Stack in go. DB itself is based on full-text query engine (comes from couchbase) reinvention of Lucene stack in go. UI is also written in go.
+
+*** Fundraising, congrats. What's next?
+
+    We are excited. Not a huge round but it's a round. We want to make it simpler. We want "to cut the crap". Remove the complexity for people wanting to deploy different type of applications. We see many different use cases.
+    Trying to cover the full scope of diff apps.
+
+    Multi-cloud approach is one of our strength.
+    Allow in the feature to let you deploy your app across many regions/cloud providers.
+
+
+
+#+HTML: <a id="lightning" />
+
+[[#talks-list][↑ Back to the list of talks]]
+* ☇ Lightning ☇
+
+**  Nano-node -  Enrico Signoriti
+
+   - Scalability: We need to manage growth. Now not only Gigas but Petas
+   - $/Gb: spend as little as possible. Failure domain.
+   - Efficiency: data center footprint
+   - simple: automate, manage...
+
+*** Future
+
+    Future of servers: 1 peta of memory per rack unit. CPU needs to catch up!
+    Latency: reduce computational ↔ data distance. More workload in parallel
+    New computing model: like serverless. Start a function on-demand
+
+*** KV drive
+
+    Trying to solve problems but introduced even more issues
+
+*** What is a nano-node?
+
+    "smaller servers"
+
+    1 node = 1 disk
+    3/5 watts
+    No management
+    Integrated CPU
+
+*** Challenges
+    - many nodes: it scales horizontally
+    - load balancing
+
+** Serverless, revealed - Daniel Maher (datadog)
+
+*** There is no cloud, it just someone else's computer
+*** Faas - Function as a service
+    not magic!
+*** Event driven Architecture
+    Faas are build on this kind of arch
+*** Resource utilisation
+    Still have to think about CPU and mem. But you also need to think about *time*!
+
+    Mainframes!
+
+*** All clouds are basically the same
+    But differences:
+    - mainly the hardware
+    - the language you can write in it
+
+      AWS: JS, Java
+      Azure: JS, C#...
+      Google: JS
+      IBM: JS
+
+*** Not a lot of difference between providers
+    so how to  pick one?
+
+*** *There is no magic in serverless*
+
+    still hardware constraints
+    still software constraints
+    even more constraints actually :)
+
+** Three heretical ideas - Mick reenman
+
+*** Time series
+    Tech financial data
+    moved to devops and monitoring data
+    Now it's everywhere!
+    Streams from machines and applications
+
+    They are everywhere!
+
+*** You've been told wrong things
+    Timeseries are *Data with tags*. It's wrong.
+
+    Whatever data model you have you can narrow it to a "simple data table".
+    But each metric should have it's *own data model*
+    for what? Correlation, aggregations, joins
+
+*** Time series has relational structure!
+
+*** SQL : analysts can write queries, your devs can write apps with it....
+    Everyone speaks SQL tools, people...
+    It scales really across your org
+*** SQLish is *not* SQL
+*** TimescaleDB
+    Timeseries database built on Postgresql
+    Does it scale? It seems to seeing the results on the slides
+*** 20% higher inserts than Postgres
+*** How?
+    Traditional transactions models is not the same as a timeseries workload. So that's how we could optimise
+
+** Git as a continuous manager - Matthias Dugué
+
+   - ssh
+   - bare git repo
+   - remote
+
+     Adding hooks in your remote repository.
+
+     One script per task.
+
+     CI vs Git test, packaging, migrations, deploy scripts
+
+     hooks all the things
+
+
+#+HTML: <a id="observability" />
+
+[[#talks-list][↑ Back to the list of talks]]
+* Observability tips for HAproxy
+
+  *Willy Tarreau* - *[[https://twitter.com/WillyTarreau][@WillyTarreau]]*
+
+  Definition of observability: it indicates how well you can guess a system's state by looking at it's output. Wikipedia
+
+  Logs and statistics
+
+** Monitoring vs observability
+
+   Observability is important. *Your client will leave you website if it doesn't work the first time*. Observability helps you with these kind of cases
+
+** LB as an observation tower
+
+   Many servers targets. So you can compare values/metrics across multiple servers.
+   It tends to be simple and not add too much complexity.
+
+   You get *a lot of logs* with LBs. *Which is good*. Archive them.
+
+   When first incident happens: it's usually to late and you don't have everything you need. That's when you go to see you LBs logs.
+
+** Failures?
+
+   You will probably see network delays on LBs. Connection retries. Connection slowdowns due to heavy firewall policies..
+   Client-side issues (VPN, service partner)
+
+** Metrics in HAproxy
+
+   Long terms metrics in logs.
+
+   Place unique IDs in requests to have the same trace identifier to correlate your logs
+
+   Stats page. Key specific (session/user/cookie) in your logs.
+
+** What happens during a client request
+
+   HAproxy has a lot of timers and will report duration at every event.
+
+   Recently added lua scripting so we want to report haproxy computation time (which is not the case as of today)
+
+   Timers are reported on stats page and in the logs (with lots of details). If it a request reaches a boundary you'll get a timeout. in between you'll get an error.
+
+   You have a set of specific termination codes which will give you information about failures (and easily scriptable due to the code failures)
+
+** HTTP statuses
+
+   HTTP status distributions will be able to show abnormal behaviours (via graphs and variations)
+
+** Queue lengths
+   Queues are really important to monitor. If you had only one thing to look at it's this one!
+
+** LB fairness
+
+   If a server gets a higher amount of request = *it's misbehaving*
+   If it gets a lower amount of requests = *it's misbehaving*
+
+** Error rate
+
+   Observe variations: sort them per server/per client ip/per url/per user-agent
+
+** All of these metrics are in the standard log format
+
+   You can override the log format directives.
+
+** Too much traffic to enable logs?
+
+   You can do sampling if you really want.
+
+   BUT I don't recommend to do so. With 20k events/s it's only *1tb/month*. Not that much!
+   If you are under that number: *ENABLE LOGGING*.
+
+** selective logs?
+
+   If you want to watch suspicious events.
+    
+   BUT *how do you determine suspicious?* How do you know if your logs will give you the information you need to troubleshoot?
+   Most of the time it's a *bad idea to do selective logging*.
+
+** ~halog~ goodies
+
+   extremely useful and performant (1-2gb per second) to get response time per url/ percentiles / detect stolen CPU 
+   Get relevant information directly from your logs.
+
+** Success stories #1
+
+   Some very high percentiles measured by a client.
+   The switch where the HAproxy was connected had TWO fibers.
+   Due to these logs they could find that one of the fiber was not working correctly!
+
+** Success Stories #2
+
+   What happened. The server was configured to use ~/dev/random~ instead of ~/dev/urandom~ which made haproxy run out of entropy and created issues for TLS handshakes.
+
+** TL;DR
+
+   - You need to exploit your stats/logs
+   - Log everything. Even if you drop them often.
+   - Process your logs automatically!
+   - detect anomalies before your clients
+
+     Interesting lectures available on the slides
+
+** Q/A
+*** How to make HAProxy evolve?
+    A company behind now. With 10+ devs. Being careful to have external contributions to make sure our ideas are not biased by our vision.
+
+*** Linux kernel how was it?
+
+    Very smart people, that's nice. When you work on old versions, you don't need to release to often. But when you need to do, that's a lot of work to be done!
+
+    Security list has very good people there. Exchange with maintainers for older kernels
+
+
+#+HTML: <a id="demonstrate-arch-ready" />
+
+[[#talks-list][↑ Back to the list of talks]]
+* How to demonstrate our architecture are ready?
+
+  *Julio Faerman* - *[[https://twitter.com/julioaws][@julioaws]]*
+
+  So, how do you demonstrate your architecture is ready?
+
+  Not necessary a "proof" but only demonstrating to yourself (at least)
+  "ready" is difficult to define also.
+
+  "We use a [popular stack] like.."
+  "We are an enterprise compliant with [standard policy].."
+  ".. we have automated testing"
+
+  In my experience, every project mostly stops at this point and /pray for the best/.
+
+  Sometimes it's enough, sometimes it's not. ¯\\under{}(ツ)\under{}/¯
+
+  Change the way of thinking about architecture:
+  Instead of an ephemeral vision we need to change our way to look at it, Performance is not the only metric to watch for.
+
+** AWS measures architecture readiness with a "framework":
+
+   - security
+   - reliability
+   - performance efficiency
+   - cost optimisation
+   - ops excellence
+
+** Security automation Yay
+
+   Security is not like in the cinema: a hacker trying to enter in.
+
+   *Nowadays it's all automated.*
+
+*** Identity management + Encryption != Privacy
+
+    Key management is really hard.
+
+    System administrators usually have too much access...
+
+    How to demonstrate that certain data is protected (for example health data)?
+
+** Live log analysis
+
+   Serverless, what is there to protect?
+   DDoS' responsibility is due to the /function/ or the /provider/?
+   Dependency libraries
+
+** Predictive security operations
+
+   *When data was accessed.* Need to be proactive on this kind of data.
+   After you have an incident with this kind of data you usually don't have a second chance.
+   It's crucial for most businesses.
+
+** Not only for security, but also reliability
+
+   E.g. Netflix Nearly 40% (/check not sure about the number) of internet traffic. Exercise from them:  Replicate traffic to be able to change regions/failures servers.
+   Simian Army (Chas monkey).
+
+** "It's about scaling the organisation" is similar approach for architecture design
+
+   It's a process. You can't just cut a monolith from one day to another.
+
+** Micro services
+
+   Infra as code you can't live without it!
+   *It needs to be completely encoded and automated*
+
+** Performance efficiency
+
+   *After secure and reliable*, we need fast!
+
+   128 vCPUs on a single box. HPC computers..
+   4Tb of RAM on a single box.
+
+   Disk intensive? → NVMe
+
+   Other components: high end GPUs, field programmable gate arrays E.g. Ryft Elasticsearch
+
+   Containers: specify just CPU and memory needs and go!
+
+   Important thing is not one or another. But the *sympathy of knowing* whether you need to use functions/containers/hosts.
+
+   You really need to look at your *cost* also! *Flexibility is usually money*.
+   Performance model from your cloud providers. [[https://channel9.msdn.com/Events/NDC/NDC-Oslo-2017/BRK02][Lynn Langit talk (Serverless - reality or BS - notes from the trenches) NDS { Oslo }]].
+
+** Operational excellence (💚)
+
+   Technique to *keep things in text files* under *shared version control*: everyone able *to learn*, *when* it was done, *why* it was done.
+
+   Cloud is a very democratising force! Not as useful if you don't know what solves what and how.
+
+   We don't want to make solutions in "boxes" (on-prem, iaas, paas, faas) but it's better *to share the experiences and knowledge* about what usages are good for what provider/architecture.
+
+   *More sharing of decisions. More sharing of requirements and how we make great software.*
+
+** Q/A
+
+*** You gave a nice list of checkbox to fill. But how to prioritise them?
+
+    That's a good question. You can go either one by one and solve the list of requirements or get the first step of each.
+
+    *Do it incrementally*. *Really*. Do *a bit of each requirements*, not only because it's how you should do but also your organisation will understand the concepts better.
+
+*** Micro-services. Is it a final state or is there something even better?
+
+    Not at all. It's *a tool to grow companies*. Sometimes your don't even manage to build a good monolith, so don't do micro-services!
+
+    *It's much more important to build your software well first.*
+
+    Case after case, growing a company is hard: you need to break your company in part. And this is where micro-services can help. But it's a *tool not a goal*.
+
+
+#+HTML: <a id="data-pipeline" />
+
+[[#talks-list][↑ Back to the list of talks]]
+* Data-pipeline @Activision
+
+  *Yaroslav Tkachenko* - *[[https://twitter.com/sap1ens][@sap1ens]]*
+
+  Datalake / Kafka clusters for our data pipeline from consoles to our data warehouse.
+
+  1+ Pb in the datalake
+  600+ number of topics in our kafka cluster
+
+  *10k+ messages per second*. from 200b to 20kb sized messages.
+
+  This talk is not about scaling number of message or message size.
+
+  You can use best practices and guidelines available online. /"It's the easy part"/.
+
+  But how do we scale to support to amount of games that we have? The "complexity" of topics and different messages passing through the pipeline.
+
+  The difficulty of Scalability are thus in this order in our data pipeline (from easiest to most difficult):
+  Volumes → Games → *Use-cases*
+
+  Kafka topics partitioned designed as a distributed system highly available.
+
+  Produce/consume in parallel every partitions.
+
+  Number of topics and partitions mattered more and more with the amount of Games.
+  Number of partitions in a fixed Kafka cluster is not infinite. Eventually you'll reach a soft limit. Latency then goes higher in the cluster.
+
+  Scaling a kafka cluster is hard: when adding a node in an existing cluster it can take *days* to be ready to get all events/data.
+
+  A bit "wild west" right now for conventions. Especially topics naming.
+
+  So we use ~$env.$source.$title (game id).$category-$version~
+
+  We allow producers to create partitions on demand. Which means every new env/title will create a new topic.
+
+** What kind of solutions to apply here?
+
+   Think about databases really. *Kafka is a kind of database*. *A topic* you can be assimilated to a table name with a database name.
+   Let's apply this convention on the topics we have.
+
+   With existing approach it's "easy" to see metrics and monitor because you have all *the information in the topic name*.
+   As a consumer you can consume a very specific data that you need.
+
+   BUT all this dynamic and this metadata *will change* (new services, deprecate titles..)
+
+   With the new approach you get a nice utilisation of topics and partitions. However it's impossible to enforce any constraints with a topic name.
+
+** Stick to the new approach
+
+   Now we need to introduce a stream processing layer.
+   Processing all the data and writing it back to Kafka.
+
+   Why? Well we don't have a lot of visibility on the data. We need to *understand our streams*. That's where a stream processing system is helpful to log to your monitoring system of your choice.
+
+   *But it's not an ETL (no domain/business logic here).*
+
+   Filtering and routing becomes really important here. "only getting a specific title from a specific env". A generic way to be able to have that. You should build in your processing stream layer this kind of new topics.
+
+** Refinery (internal name at Activision)
+
+   Central data team. Lots of different producers (game studios, back devs...) different format (8 different formats).
+   When you need to consume all this kind of formats. How do you do that?
+   Not a good idea to expose that in the topic name itself.
+
+   Trick you can use: a message envelope. Treat the message as a "byte array" and *add a header with metadata* to be able to route/filter your data stream. So your stream processing layer can just access these headers and don't need to understand the business envelope.
+   We do it with protobuf v2. Unique message ID for every message in your data pipeline. (good for deduplication for example).
+   The "business message" is just a "byte array". We also have the ~schemainfo~ in the metadata to understand how to read the data.
+
+** Schema registry
+
+   You need to register the schema *before* sending any data in the pipeline. We have a custom schema registry.
+
+** Recap
+
+   Imagine we implement all these changes. Adding new game should be as simple as adding new messages! From the data platform perspective we don't need to do much *thanks to that stream processing layer*.
+   It's still flexible enough. It's also easier to extend the pipeline because topics contains very precise *metatype*.
+   Stream filtering helps all sort of use cases.
+
+** Q/A
+
+*** Is this all live?
+
+    We still run lots of legacy games. Hard to apply all these changes consistently.
+    But for all new games this year the message header will be in use.
+    It's still a work in progress :)
+
+    However the schema registry used for many years now and it helped a lot.
+
+*** How important is the schema registry
+
+    For small teams: it's not necessary.
+    When you add more consumers/producers (diff teams / diff goals) then it becomes *very important*. It creates *contracts* between systems/teams.
+
+*** Game studios can have bad reputation. How do you enjoy it?
+
+    I'm not a big video game player. But at Activision we have a very good independent model (even after acquisitions and new companies join in).
+
+
+#+HTML: <a id="just-right-consistency" />
+
+[[#talks-list][↑ Back to the list of talks]]
+* Just Right Consistency
+
+  [[https://pages.lip6.fr/Marc.Shapiro/][*Marc Shapiro*]] - Inria
+
+  New concept. Basically you need to reconcile applications with databases.
+
+  Data as available *as possible*. And as consistent as it needs to be.
+
+  Your application is your top level goal to make it "correct"
+
+** Data is important
+
+   Geo distribution is important you know that.
+
+   Application logic close to your data.
+
+   The problem is when you *get an update*. You need to replicate those. Problem of that is the "consistency problem".
+   Famous CAP theorem tells you "you have to choose" between *Consistent and Partition* or *Partition and Available*.
+
+** Strong consistency
+
+   Google Spanner / Azure Cosmos DB
+
+   Round trip where you need to wait (synchronous update). Application is correct but you get a slow expensive query.
+
+   If you have a partition: you are stuck!
+
+** Eventual consistency
+
+   Opposite extreme.
+   Do your update. *Fast* (as fast as your read). If there's a partition you don't care, you still propagate.
+
+   But you get concurrency anomalies. (updates during partitions... what do you do?)
+
+   E.g. cassandra
+
+** What's right for your application?
+
+   Medicine FMK app: create a prescription, your doctor can add medicine in the prescription, adds the patient. Then a pharmacy can check the prescription and give you the medicine.
+
+   What do you want to be sure about?
+   - A reference from your doctor: *you want it to exist*. *"Reference consistency"*
+   - Pharmacy doesn't *over deliver*.
+
+     Strong consistency is much more than you need. But EC is much too weak.
+
+     "One size doesn't fit all"
+
+     Let's start from the invariants and walk our way to the consistency.
+
+     Let's do a leap of faith and forget about the invariants. Let's look at the code. *Synchronise only when strictly necessary*.
+
+     CRDTs: instead of doing assignments (your need Strong Consistency) you find "Conflict Free replicated data types". E.g. Incremental updates (concurrently commutative updates works fine!)
+
+** Pattern 1
+
+   Ordering things in some order.
+
+   First you create the prescription and you fill it, THEN you add the pointers (to the doctor and the patient).
+
+   *Eventual Consistency doesn't maintain that order.*
+
+   You thus need *Causal Consistency* it's a way to ensure events arrive in the order that your expect. It's *AP-compatible.*
+
+** Pattern 2
+
+   Joint update. All updated or none.
+
+   *"all or nothing update"*. EC doesn't work and CP is overkill!
+
+** Pattern 3 precondition
+
+   "I have to test before giving your a medicine". There's an "invariant test" (the amount of medicine doesn't go negative for instance)
+
+   *Some concurrency is fine*. For example if someone is ADDING a count in the medicine, then we can process and retrieve a medicine without any problem.
+
+   But if two person is retrieving at the same time the medicine: you have a problem. Precondition is /not stable/ w.r.t concurrency.
+   You know it in your code base directly!
+
+** TL;DR
+
+   You know the patterns in your code.
+   - Ordered updates AP manner
+   - All or nothing updates AP manner
+   - Stable still ok.
+
+** Q/A
+
+*** Tell us more about [[https://syncfree.github.io/antidote/][AntidoteDB]]
+
+    Developed in academic consortium. European project.
+    With best practices for software in mind (peer review, testings etc). It's available on Github.
+
+*** Will people move to CRDTs?
+
+    That's the hard part: migrations for existing projects
+
+*** How did you come to the CRDTs idea and how it's used by the industry?
+
+    I was pretty much surprised the industry started using it really quick! First time in my academic career that some of my work was really useful :)
+    We knew we could do something better for this database problem so we searched about it.
+
+*** What's next?
+
+    Focus on antidote but also focusing on the edges.
+    Hub and spoke. We try to keep these guarantees between data layers and applications.
+
+
+#+HTML: <a id="kubernetes-101" />
+
+[[#talks-list][↑ Back to the list of talks]]
+* Kubernetes 101
+
+  *Bridget Kromhout* - *[[https://twitter.com/bridgetkromhout][@bridgetkromhout]]* - [[https://bridgetkromhout.com/speaking/2018/dotscale/][slides]]
+  North central of Canada
+  Developer advocate at Microsoft
+
+  Kubernetes "From the greek: the one that steers"
+
+  Quick k8s overview. Just spoiler.
+  How did we get to that time. And where is "here".
+
+  Been in tech for a while. Sometimes we want to look back on old things.
+
+  History of me doing stuff with containers. Running docker in 2013 in a small company DramaFever when it was said "don't run docker in production" before 1.0.
+
+  Containers are really great to create repeatable envs.
+  Not really great for new failures modes. "a dev image is in prod?" WTF?
+
+  Back in the 90s we were already using containers: freebsd jails, solaris zones, LXC.
+  They were things but not widely adopted. It used to be hard and was not that easy to use.
+
+  *More usable, more accessible*: Cloud Foundry, Docker, Rocket, OCI.
+
+  When you are into the containers world you *believe* everyone is using them. But that's *usually not the case*.
+
+  When K8s came into the scene. I think it was in 2014 that I really heard about it. At that time you didn't know it would take all the hype.
+
+  *It is a step*. But it's *not the final state,* really. There's lots of other orchestrators in production that work fine too.
+
+  *Remember it's a TOOL not a GOAL*.
+
+  What people are excited about in that "landscape". What they have in common: focus on containerisation (isolation, reproducability, dynamic orchestration). Focus on micro-services.
+  Micro services are great but not a magical solution for every thing.
+
+  *Ecosystem scene is complex: because the problem itself is complex!*
+
+  /"Computers are hard and when you add people it's even harder and then it goes on fire"/
+
+  Your just gonna move the complexity somewhere else.. You get to *chose* where the problems can be.
+
+  Kubernetes help you to manage that complexity.
+
+** From scratch tutorials
+
+   - [[https://thenewstack.io/kubernetes-an-overview][https://thenewstack.io/kubernetes-an-overview]]
+   - https://github.com/kelseyhightower/kubernetes-the-hard-way/
+
+** Architecture
+
+   API, Control plane (master nodes), worker nodes
+
+   Built-in service discovery.
+
+   *where are we gonna spend our energy and efforts?*
+
+** Master architecture
+
+   API server, Scheduler, controller
+   based on etcd
+
+   The pretty opinionated thing in K8s: *ETCD*. Everything else is pretty much not opinionated.
+
+** Node architecture
+
+   Pod can have one or more containers in it. Shared resources. Pods can be scaled.
+   Optional addons: DNS, UI, ...
+
+** How to learn about K8s?
+
+   Kubernetes workshop doesn't give you all the tools to go back in your company and build everything there!
+
+   How to democratise the learning about K8s? Open source K8s training of course!
+   Jérome Petazzoni tries to do so: [[https://github.com/jpetazzo/container.training][jpetazzoni/container.training]]
+
+   Walk through concepts and terms, walk through operation k8s.
+
+   Getting people to use ~kubectl,~ getting people to use containers, what to do with a registry.
+
+   K8s dashboard, how to get it securely exposed.
+
+   There's direction for Azure and AWS *for now*.
+
+   Always emotion is future. We have upcoming events coming. Run the training at events! *Send us PRs*
+
+   Lucas Kaldstrom's intro to kube
+
+   Projects to watch: Helm, Brigade, Virtual Kubelet (plug your hosts in a  K8s cluster, or anything else (VM, on-prem) to be treated as a kubernetes node)
+
+   Erik St Martin, "k8s is not the thing, it's what's going to get us to the thing"
+
+   I work at microsoft and my job is to get people use linux. Join us we are hiring.
+
+** Q/A
+
+*** Devopsdays tells us about that
+
+    2015 I took over looking after the community. Lots of conferences over several continents. It's a great thing. Do participate if you can and if you want to organise when come tell me!
+
+*** More about Microsoft? The involvement in open source is striking
+
+    It's clear, where the growth is. It's exciting AND relevant to business. And lots of customers are coming saying they want to use Linux...
+    Putting investments into what clients want to use is an easy choice to make!
+
+    It's exciting time! People sharing their experience with each others. Trying to serve the public and learn from.
+
+
+    -----
+
+    /I unfortunately couldn't stay for the last two talks, Sébastien Elet did a great job at summarising the talks so I leave you to his tweets/
+
+    -----
+
+
+#+HTML: <a id="scale-is-hard" />
+
+[[#talks-list][↑ Back to the list of talks]]
+* At Scale everything is Hard
+
+  *Paul Dix* - *[[https://twitter.com/pauldix][@pauldix]]*
+
+  https://twitter.com/SebastienElet/status/1002576816442363905
+
+
+#+HTML: <a id="infra-data" />
+
+[[#talks-list][↑ Back to the list of talks]]
+* Infrastructure Data
+
+  *Jeremy Edberg* - *[[https://twitter.com/jedberg][@jedberg]]*
+
+  https://twitter.com/SebastienElet/status/1002582998116651008
+
+
+[[#talks-list][↑ Back to the list of talks]]
