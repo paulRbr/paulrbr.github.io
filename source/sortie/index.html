@@ -32,13 +32,17 @@
         width: 8em;
     }
 
-    #name, #born, #address {
+    #name, #born, #where, #address {
         width: 10em;
         border: 1px solid #999;
     }
 
-    #date, #place {
+    #date, #date-time, #place {
         border: 1px solid #999;
+    }
+
+    .notes {
+        font-size: 0.8em;
     }
 
     @media screen and (max-width : 640px) {
@@ -62,58 +66,80 @@
 
 <center><h1>ATTESTATION DE DÉPLACEMENT DÉROGATOIRE</h1></center>
 
-<p>En application de l'article 1er du décret du 16 mars 2020 portant réglementation des déplacements dans le cadre de la lutte contre la propagation du virus Covid-19 :</p>
-
+<p>En application de l’article 3 du décret du 23 mars 2020 prescrivant les mesures générales nécessaires pour faire face à l’épidémie de Covid19 dans le cadre de l’état d’urgence sanitaire :</p>
 
 <form>
-    <p><b>Je soussigné(e)</b></p>
+    <p>Je soussigné(e),</p>
     <br/>
     <label class="lbl" for="name"><b>Mme / M.</b></label>
     <input id="name" type="text"><br/>
 
-    <label class="lbl" for="born"><b>Né(e) le :</b></label>
+    <label class="lbl" for="born"><b>Né(e) le :</b></label>
     <input id="born" type="date"><br/>
 
-    <label class="lbl" for="address"><b>Demeurant :</b></label>
+    <label class="lbl" for="where"><b>À :</b></label>
+    <input id="where" type="text"><br/>
+
+    <label class="lbl" for="address"><b>Demeurant :</b></label>
     <input id="address" type="text"><br/>
 
     <br/>
-    <p>certifie que mon déplacement est lié au motif suivant (cocher la case) autorisé par l'article 1er du décret du 16 mars 2020 portant réglementation des déplacements dans le cadre de la lutte contre la propagation du virus Covid-19:</p>
+    <p>certifie que mon déplacement est lié au motif suivant (cocher la case) autorisé par l’article 3 du décret du 23 mars 2020 prescrivant les mesures générales nécessaires pour faire face à l’épidémie de Covid19 dans le cadre de l’état d’urgence sanitaire¹ :</p>
     <br/>
     <p>
         <input id="choix_a" type="radio" name="choix">
-        <label for="choix_a" id="label_choix_a">déplacements entre le domicile et le lieu d'exercice de l'activité professionnelle, lorsqu'ils sont indispensables à l'exercice d'activités ne pouvant être organisées sous forme de télétravail (sur justificatif permanent) ou déplacements professionnels ne pouvant être différés;</label>
+        <label for="choix_a" id="label_choix_a">Déplacements entre le domicile et le lieu d’exercice de l’activité professionnelle, lorsqu’ils sont indispensables à l’exercice d’activités ne pouvant être organisées sous forme de télétravail ou déplacements professionnels ne pouvant être différés².</label>
     </p>
 
     <p>
         <input id="choix_b" type="radio" name="choix">
-        <label for="choix_b" id="label_choix_b">déplacements pour effectuer des achats de première nécessité dans des établissements autorisés (liste sur gouvernement.fr);</label>
+        <label for="choix_b" id="label_choix_b">Déplacements pour effectuer des achats de fournitures nécessaires à l’activité professionnelle et des achats de première nécessité³ dans des établissements dont les activités demeurent autorisées (liste sur gouvernement.fr).</label>
     </p>
 
     <p>
         <input id="choix_c" type="radio" name="choix">
-        <label for="choix_c" id="label_choix_c">déplacements pour motif de santé;</label>
+        <label for="choix_c" id="label_choix_c">Consultations et soins ne pouvant être assurés à distance et ne pouvant être différés ; consultations et soins des patients atteints d'une affection de longue durée.</label>
     </p>
 
     <p>
         <input id="choix_d" type="radio" name="choix">
-        <label for="choix_d" id="label_choix_d">déplacements pour motif familial impérieux, pour l'assistance aux personnes vulnérables ou la garde d'enfants;</label>
+        <label for="choix_d" id="label_choix_d">Déplacements pour motif familial impérieux, pour l’assistance aux personnes vulnérables ou la garde d’enfants.</label>
     </p>
 
     <p>
         <input id="choix_e" type="radio" name="choix">
-        <label for="choix_e" id="label_choix_e">déplacements brefs, à proximité du domicile, liés à l'activité physique individuelle des personnes, à l'exclusion de toute pratique sportive collective, et aux besoins des animaux de compagnie.</label>
+        <label for="choix_e" id="label_choix_e">Déplacements brefs, dans la limite d'une heure quotidienne et dans un rayon maximal d'un kilomètre autour du domicile, liés soit à l'activité physique individuelle des personnes, à l'exclusion de toute pratique sportive collective et de toute proximité avec d'autres personnes, soit à la promenade avec les seules personnes regroupées dans un même domicile, soit aux besoins des animaux de compagnie.</label>
+    </p>
+
+    <p>
+        <input id="choix_f" type="radio" name="choix">
+        <label for="choix_f" id="label_choix_f">Convocation judiciaire ou administrative.</label>
+    </p>
+
+    <p>
+        <input id="choix_g" type="radio" name="choix">
+        <label for="choix_g" id="label_choix_g">Participation à des missions d’intérêt général sur demande de l’autorité administrative.</label>
     </p>
 
     <p align="right">
-        <label for="place">Fait à </label><input type="text" id="place">
-        <label for="date">le </label><input type="date" id="date"><br>
+        <label for="place">Fait à </label><input type="text" id="place"><br/>
+        <label for="date">le </label><input type="date" id="date">
+        <label for="date-time">à </label><input type="time" id="date-time"><br/>
         (signature)<br/>
         <canvas style="border: 1px solid #999" id="signature" width="600" height="200"></canvas><br/>
         <button onclick="can_clear();" id="clear_btn">Effacer</button>
 
     </p>
 
+    <p class="notes">
+      ¹Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s’il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.
+    </p>
+    <p class="notes">
+      ²À utiliser par les travailleurs non-salariés, lorsqu’ils ne peuvent disposer d’un justificatif de déplacement établi par leur employeur.
+    </p>
+    <p class="notes">
+      ³Y compris les acquisitions à titre gratuit (distribution de denrées alimentaires...) et les déplacements liés à la perception de prestations sociales et au retrait d’espèces.
+    </p>
 </form>
 
 <center><button onclick="render();" id="render_btn">Génerer</button></center><br/>
@@ -127,11 +153,14 @@
 
     function $(id) { return document.getElementById(id); }
     var is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    var timeMin = 1000*60
+    var offset = new Date().getTimezoneOffset()
 
     if (is_safari) {
         $('date').value = new Date().toLocaleDateString();
     } else {
         $('date').valueAsDate = new Date();
+        $('date-time').valueAsNumber = Math.floor(new Date().getTime()/timeMin)*timeMin - offset*timeMin;
     }
 
     // CANVAS HANDLING
@@ -207,13 +236,13 @@
         $("clear_btn").remove();
         $("render_btn").remove();
 
-        to_render = ['name', 'born', 'address', 'place', 'date'];
+        to_render = ['name', 'born', 'where', 'address', 'place', 'date', 'date-time'];
         to_render.forEach(function(el) {
             $(el).insertAdjacentHTML('afterend', $(el).value);
             $(el).remove();
         });
 
-        to_disable = ['choix_a', 'choix_b', 'choix_c', 'choix_d', 'choix_e'];
+        to_disable = ['choix_a', 'choix_b', 'choix_c', 'choix_d', 'choix_e', 'choix_f', 'choix_g'];
         to_disable.forEach(function(el) {
             if (!$(el).checked) {
                 $(el).remove();
