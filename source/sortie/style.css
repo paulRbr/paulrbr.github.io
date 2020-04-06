@@ -1,0 +1,77 @@
+html { width: 100%; text-size-adjust: none; }
+
+body {
+    width: 210mm;
+    margin: 1em auto;
+    font-family: Verdana, Geneva, sans-serif;
+}
+
+h1 {
+    font-size: 1.6em;
+}
+
+button {font-size: 2em; border: 1px solid black;}
+footer {font-size: 1em; margin-top: 50px;}
+
+#page {
+    border: 1px solid black;
+    padding: 1em;
+}
+
+input, label, p {
+    font-size: 1em;
+}
+
+.lbl {
+    display: inline-block;
+    width: 8em;
+}
+
+#name, #born, #where, #address {
+    width: 10em;
+    border: 1px solid #999;
+}
+
+#date, #date-time, #place {
+    border: 1px solid #999;
+}
+
+.notes {
+    font-size: 0.8em;
+}
+
+#signature {
+    border: 1px solid #999;
+    width: 500px;
+    height: 200px;
+}
+
+.end {
+    margin: 1.4em auto;
+}
+
+.right {
+    float: right;
+}
+
+.left {
+    float: left;
+}
+.clear-float {
+    clear: both;
+}
+
+@media screen and (max-width : 640px) {
+    html { font-size: 200%;}
+    body { width: 100%; }
+    input[type=radio] { transform: scale(1.5);}
+    canvas {font-size: 100%;}
+    #page {padding: 1em; border: 0;}
+}
+
+@media print {
+    #reset_btn {display: none;}
+    footer {display: none;}
+    body {margin: 0;}
+    #page {padding: 0; border: 0;}
+}

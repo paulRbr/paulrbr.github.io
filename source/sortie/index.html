@@ -1,259 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Attestation de déplacement</title>
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <meta charset="UTF-8">
+  <title>Attestation de déplacement</title>
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <meta name="language" content="French">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id='page'>
+    <center><h1>ATTESTATION DE DÉPLACEMENT DÉROGATOIRE</h1></center>
 
-<style type="text/css">
-    html { width: 100%; text-size-adjust: none; }
+    <p>En application de l’article 3 du décret du 23 mars 2020 prescrivant les mesures générales nécessaires pour faire face à l’épidémie de Covid19 dans le cadre de l’état d’urgence sanitaire :</p>
 
-    body {
-        width: 210mm;
-        margin: 1em auto;
-        font-family: Verdana, Geneva, sans-serif;
-    }
+    <form>
+      <p>Je soussigné(e),</p>
+      <br/>
+      <label class="lbl" for="name"><b>Mme / M.</b></label>
+      <input id="name" type="text"><br/>
 
-    button {font-size: 2em; border: 1px solid black;}
-    footer {font-size: 1em; margin-top: 50px;}
+      <label class="lbl" for="born"><b>Né(e) le :</b></label>
+      <input id="born" type="date"><br/>
 
-    #page {
-        border: 1px solid black;
-        padding: 1em;
-    }
+      <label class="lbl" for="where"><b>À :</b></label>
+      <input id="where" type="text"><br/>
 
-    input, label, p {
-        font-size: 1em;
-    }
+      <label class="lbl" for="address"><b>Demeurant :</b></label>
+      <input id="address" type="text"><br/>
 
-    .lbl {
-        display: inline-block;
-        width: 8em;
-    }
-
-    #name, #born, #where, #address {
-        width: 10em;
-        border: 1px solid #999;
-    }
-
-    #date, #date-time, #place {
-        border: 1px solid #999;
-    }
-
-    .notes {
-        font-size: 0.8em;
-    }
-
-    @media screen and (max-width : 640px) {
-        html { font-size: 200%;}
-        input[type=radio] {zoom: 200%;}
-        canvas {font-size: 100%;}
-        #page {padding: 1em; border: 0;}
-    }
-
-    @media print {
-        #reset_btn {display: none;}
-        footer {display: none;}
-        body {margin: 0;}
-        #page {padding: 0; border: 0;}
-    }
-
-
-</style>
-
-<div id='page'>
-
-<center><h1>ATTESTATION DE DÉPLACEMENT DÉROGATOIRE</h1></center>
-
-<p>En application de l’article 3 du décret du 23 mars 2020 prescrivant les mesures générales nécessaires pour faire face à l’épidémie de Covid19 dans le cadre de l’état d’urgence sanitaire :</p>
-
-<form>
-    <p>Je soussigné(e),</p>
-    <br/>
-    <label class="lbl" for="name"><b>Mme / M.</b></label>
-    <input id="name" type="text"><br/>
-
-    <label class="lbl" for="born"><b>Né(e) le :</b></label>
-    <input id="born" type="date"><br/>
-
-    <label class="lbl" for="where"><b>À :</b></label>
-    <input id="where" type="text"><br/>
-
-    <label class="lbl" for="address"><b>Demeurant :</b></label>
-    <input id="address" type="text"><br/>
-
-    <br/>
-    <p>certifie que mon déplacement est lié au motif suivant (cocher la case) autorisé par l’article 3 du décret du 23 mars 2020 prescrivant les mesures générales nécessaires pour faire face à l’épidémie de Covid19 dans le cadre de l’état d’urgence sanitaire¹ :</p>
-    <br/>
-    <p>
-        <input id="choix_a" type="radio" name="choix">
+      <br/>
+      <p>certifie que mon déplacement est lié au motif suivant (cocher la case) autorisé par l’article 3 du décret du 23 mars 2020 prescrivant les mesures générales nécessaires pour faire face à l’épidémie de Covid19 dans le cadre de l’état d’urgence sanitaire¹ :</p>
+      <br/>
+      <p>
+        <input id="choix_a" type="radio" name="choix" value="travail">
         <label for="choix_a" id="label_choix_a">Déplacements entre le domicile et le lieu d’exercice de l’activité professionnelle, lorsqu’ils sont indispensables à l’exercice d’activités ne pouvant être organisées sous forme de télétravail ou déplacements professionnels ne pouvant être différés².</label>
-    </p>
+      </p>
 
-    <p>
-        <input id="choix_b" type="radio" name="choix">
+      <p>
+        <input id="choix_b" type="radio" name="choix" value="courses">
         <label for="choix_b" id="label_choix_b">Déplacements pour effectuer des achats de fournitures nécessaires à l’activité professionnelle et des achats de première nécessité³ dans des établissements dont les activités demeurent autorisées (liste sur gouvernement.fr).</label>
-    </p>
+      </p>
 
-    <p>
-        <input id="choix_c" type="radio" name="choix">
+      <p>
+        <input id="choix_c" type="radio" name="choix" value="sante">
         <label for="choix_c" id="label_choix_c">Consultations et soins ne pouvant être assurés à distance et ne pouvant être différés ; consultations et soins des patients atteints d'une affection de longue durée.</label>
-    </p>
+      </p>
 
-    <p>
-        <input id="choix_d" type="radio" name="choix">
+      <p>
+        <input id="choix_d" type="radio" name="choix" value="famille">
         <label for="choix_d" id="label_choix_d">Déplacements pour motif familial impérieux, pour l’assistance aux personnes vulnérables ou la garde d’enfants.</label>
-    </p>
+      </p>
 
-    <p>
-        <input id="choix_e" type="radio" name="choix">
+      <p>
+        <input id="choix_e" type="radio" name="choix" value="sport">
         <label for="choix_e" id="label_choix_e">Déplacements brefs, dans la limite d'une heure quotidienne et dans un rayon maximal d'un kilomètre autour du domicile, liés soit à l'activité physique individuelle des personnes, à l'exclusion de toute pratique sportive collective et de toute proximité avec d'autres personnes, soit à la promenade avec les seules personnes regroupées dans un même domicile, soit aux besoins des animaux de compagnie.</label>
-    </p>
+      </p>
 
-    <p>
-        <input id="choix_f" type="radio" name="choix">
+      <p>
+        <input id="choix_f" type="radio" name="choix" value="judiciaire">
         <label for="choix_f" id="label_choix_f">Convocation judiciaire ou administrative.</label>
-    </p>
+      </p>
 
-    <p>
-        <input id="choix_g" type="radio" name="choix">
+      <p>
+        <input id="choix_g" type="radio" name="choix" value="missions">
         <label for="choix_g" id="label_choix_g">Participation à des missions d’intérêt général sur demande de l’autorité administrative.</label>
-    </p>
+      </p>
 
-    <p align="right">
-        <label for="place">Fait à </label><input type="text" id="place"><br/>
+      <p class="end left">
+        <label for="place">Fait à </label><input type="text" id="place">,<br/>
         <label for="date">le </label><input type="date" id="date">
         <label for="date-time">à </label><input type="time" id="date-time"><br/>
-        (signature)<br/>
-        <canvas style="border: 1px solid #999" id="signature" width="600" height="200"></canvas><br/>
+        (Date et heure de début de sortie)<br/>
+        <canvas id="signature" width="500" height="200"></canvas><br/>
         <button onclick="can_clear();" id="clear_btn">Effacer</button>
+      </p>
 
-    </p>
+      <span class="right">
+        <canvas id="qrcode"></canvas>
+      </span>
 
-    <p class="notes">
-      ¹Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s’il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.
-    </p>
-    <p class="notes">
-      ²À utiliser par les travailleurs non-salariés, lorsqu’ils ne peuvent disposer d’un justificatif de déplacement établi par leur employeur.
-    </p>
-    <p class="notes">
-      ³Y compris les acquisitions à titre gratuit (distribution de denrées alimentaires...) et les déplacements liés à la perception de prestations sociales et au retrait d’espèces.
-    </p>
-</form>
+      <p class="notes clear-float">
+        ¹Les personnes souhaitant bénéficier de l'une de ces exceptions doivent se munir s’il y a lieu, lors de leurs déplacements hors de leur domicile, d'un document leur permettant de justifier que le déplacement considéré entre dans le champ de l'une de ces exceptions.
+      </p>
+      <p class="notes">
+        ²À utiliser par les travailleurs non-salariés, lorsqu’ils ne peuvent disposer d’un justificatif de déplacement établi par leur employeur.
+      </p>
+      <p class="notes">
+        ³Y compris les acquisitions à titre gratuit (distribution de denrées alimentaires...) et les déplacements liés à la perception de prestations sociales et au retrait d’espèces.
+      </p>
+    </form>
 
-<center><button onclick="render();" id="render_btn">Génerer</button></center><br/>
-<center><button onclick="window.location.reload();" id="reset_btn">Remise à zéro</button></center>
+    <center><button onclick="render();" id="render_btn">Génerer</button></center><br/>
+    <center><button onclick="window.location.reload();" id="reset_btn">Remise à zéro</button></center>
 
-</div>
+  </div>
 
-<center><footer>Conforme RGPD, certifié sans stockage et sans cookies. code dispo sur <a href="https://github.com/paulrbr/covid-sortie">https://github.com/paulrbr/covid-sortie</a> (forké de <a href="https://github.com/vikbez/covid-sortie">https://github.com/vikbez/covid-sortie</a>)</footer></center>
+  <center><footer>Conforme RGPD, certifié sans stockage et sans cookies. code dispo sur <a href="https://github.com/paulrbr/covid-sortie">https://github.com/paulrbr/covid-sortie</a> (forké de <a href="https://github.com/vikbez/covid-sortie">https://github.com/vikbez/covid-sortie</a>)</footer></center>
 
-<script type="text/javascript">
-
-    function $(id) { return document.getElementById(id); }
-    var is_safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    var timeMin = 1000*60
-    var offset = new Date().getTimezoneOffset()
-
-    if (is_safari) {
-        $('date').value = new Date().toLocaleDateString();
-    } else {
-        $('date').valueAsDate = new Date();
-        $('date-time').valueAsNumber = Math.floor(new Date().getTime()/timeMin)*timeMin - offset*timeMin;
-    }
-
-    // CANVAS HANDLING
-
-    var canvas = $('signature');
-    canvas.addEventListener('mousedown', ev_mousedown, false);
-    canvas.addEventListener('mousemove', ev_mousemove, false);
-    window.addEventListener('mouseup', ev_mouseup, false);
-
-    canvas.addEventListener('touchstart', ev_touchstart, false);
-    canvas.addEventListener('touchmove', ev_touchmove, false);
-    window.addEventListener('touchend', ev_mouseup, false);
-
-    ctx = canvas.getContext('2d');
-
-    var started = false;
-
-    function ev_mouseup(ev) {
-        started = false;
-    }
-
-    function ev_touchstart(ev) {
-        ev.preventDefault();
-        started = true;
-        var rect = canvas.getBoundingClientRect();
-        var x = ev.touches[0].clientX;
-        var y = ev.touches[0].clientY;
-        x = x - rect.left;
-        y = y - rect.top;
-
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-
-    function ev_touchmove(ev) {
-        ev.preventDefault();
-        var rect = canvas.getBoundingClientRect();
-        var x = ev.touches[0].clientX;
-        var y = ev.touches[0].clientY;
-        x = x - rect.left;
-        y = y - rect.top;
-
-        if (started) {
-            ctx.lineTo(x, y);
-            ctx.stroke();
-        }
-    }
-
-    function ev_mousedown(ev) {
-        started = true;
-        ctx.beginPath();
-        ctx.moveTo(ev.offsetX, ev.offsetY);
-    }
-
-    function ev_mousemove(ev) {
-        if (started) {
-            ctx.lineTo(ev.offsetX, ev.offsetY);
-            ctx.stroke();
-        }
-    }
-
-    function can_clear() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        return false;
-    }
-
-    // RENDERING
-
-    function render() {
-        canvas.removeEventListener('mousedown', ev_mousedown);
-        canvas.style.cssText = "border: none;";
-
-        $("clear_btn").remove();
-        $("render_btn").remove();
-
-        to_render = ['name', 'born', 'where', 'address', 'place', 'date', 'date-time'];
-        to_render.forEach(function(el) {
-            $(el).insertAdjacentHTML('afterend', $(el).value);
-            $(el).remove();
-        });
-
-        to_disable = ['choix_a', 'choix_b', 'choix_c', 'choix_d', 'choix_e', 'choix_f', 'choix_g'];
-        to_disable.forEach(function(el) {
-            if (!$(el).checked) {
-                $(el).remove();
-                $('label_' + el).remove();
-            }
-        });
-
-        window.print();
-    }
-
-</script>
-
+  <!-- https://www.npmjs.com/package/qrcode -->
+  <script src="qrcode.min.js"></script>
+  <script src="covid-19.js"></script>
 </body>
 </html>
