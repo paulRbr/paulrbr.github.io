@@ -89,7 +89,7 @@ function render() {
   if (place.toLowerCase() == "paris" &&
       10 <= nowHours && nowHours < 19) {
     alert(
-      "D’après l’arrêté n°2020-00280 de la Préfecture de Police de Paris, il est désormais interdit de faire du sport entre 10h et 19h.\n \
+      "D’après l’arrêté n°2020-00280 de la préfecture de police de Paris, il est désormais interdit de faire du sport entre 10h et 19h.\n \
 \n \
 Êtes vous sûr de vouloir sortir? \n \
 \n \
