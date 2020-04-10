@@ -1,0 +1,3 @@
+[submodule "source/sortie"]
+	path = source/sortie
+	url = git@github.com:paulrbr/covid-sortie.git
