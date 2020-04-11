@@ -1,5 +1,8 @@
 image: ruby:2.6
 
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 cache:
   paths:
     - vendor
