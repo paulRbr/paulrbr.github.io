@@ -1,6 +1,9 @@
 language: ruby
+git:
+  submodules: false
 install:
   - bundle install --path vendor/bundle
+  - git submodule update --init --remote --recursive
 script:
   - bundle exec middleman build --clean
 after_success:
