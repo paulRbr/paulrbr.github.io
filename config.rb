@@ -82,6 +82,9 @@ activate :syntax # , line_numbers: true
 
 activate :sprockets
 
+# Ignore some source files
+ignore "/sortie/.git"
+
 # Reload the browser automatically whenever files change
 configure :development do
   set :site_url, "http://127.0.0.1:4567"
