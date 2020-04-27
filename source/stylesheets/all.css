@@ -146,6 +146,12 @@ ul.flat-ul li {
   font-size: 16px;
   padding: 0 8px 0 0; }
 
+#social img.svg {
+  margin: 14px;
+  width: 19px;
+  height: 19px;
+}
+
 #social img {
   -webkit-filter: invert(50%);
   -moz-filter: invert(50%);
