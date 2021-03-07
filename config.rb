@@ -38,6 +38,8 @@ set :renderer, AnchorHeaderRenderer
 require "lib/helpers.rb"
 helpers DateHelpers
 
+Time.zone = "Paris"
+
 # Methods defined in the helpers block are available in templates
 # helpers do
 #   def some_helper
