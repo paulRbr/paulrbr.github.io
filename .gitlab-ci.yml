@@ -11,6 +11,8 @@ cache:
   before_script:
     - apt-get update -yqqq
     - apt-get install -y nodejs
+    - gem install bundler
+    - bundle update --bundler
     - bundle install --deployment
 
 test: &test
