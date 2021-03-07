@@ -278,7 +278,7 @@ a.button:active {
   display: none }
 
 .highlight {
-  padding: 10px; }
+  padding: 5px 10px; }
 
 /* Common style for pseudo-elements */
 .article-excerpt {
