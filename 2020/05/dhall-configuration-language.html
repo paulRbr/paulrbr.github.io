@@ -1,0 +1,295 @@
+<!doctype html> <html> <head> <meta charset=utf-8 /> <meta name=description content="This blogpost was originally posted on the Fretlink Tech blog while I was working there in 2020 Did you ever enjoy writing XML files by hand? No, OK, I thought so. Was it better with JSON? No. What about YAML where the indentation is so easy right? No, none of these are enjoyable. The reason for all these no is simple: formats are meant to be read or written by machines and not by humans. As computing folks we most probably prefer to write code because programming is what gives us the control over machines' behaviour. Follow me into the fabulous world of programmable configuration files. I'm pretty sure your will like it. "> <meta name=viewport content="width=device-width, initial-scale=1"> <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1"> <title>Adding Fun to the Configuration Burden</title> <link rel=alternate type="application/atom+xml" title="Atom Feed" href="/feed.xml"/> <link href="../../stylesheets/all.css" rel=stylesheet /><link href="../../stylesheets/color-syntax.css" rel=stylesheet /><link href="../../stylesheets/send.css" rel=stylesheet /> <script src="../../javascripts/all.js"></script><script src="../../javascripts/search.js"></script><script src="../../javascripts/live.js"></script> </head> <body class="x2020 x2020_05 x2020_05_dhall-configuration-language"> <aside> <div class=welcome> <h1><a href="/">Paul Bonaud</a></h1> <div class="summary subtitle"> Passionate about code, challenges and automated systems </div> </div> <div id=menu> <ul class=flat-ul> <li><a href="/">Blog</a></li> <li><a href="/talks.html">Talks</a></li> <li><a href="/about.html">About</a></li> <li><a href="/cv.pdf" target=_blank>Resume</a></li> </ul> </div> <div id=social> <ul class=flat-ul> <li><a rel=me href="https://mastodon.social/@paulrbr"><img src="../../images/mastodon.svg" alt=mastodon class=svg /></a></li> <li><a rel=me href="https://twitter.com/paulrb_r"><img src="../../images/twitter.svg" alt=twitter class=svg /></a></li> <li><a rel=me href="https://pgp.mit.edu/pks/lookup?search=paul+bonaud&op=index"><img src="../../images/mail.png" alt=email /></a></li> <li><a rel=me href="https://gitlab.com/paulrbr"><img src="../../images/gitlab.svg" alt=gitlab class=svg /></a></li> <li><a rel=me href="https://github.com/paulrbr"><img src="../../images/github.svg" alt=github class=svg /></a></li> </ul> </div> </aside> <article id=main role=main> <div class=date>May 26th, 2020</div> <h1>Adding Fun to the Configuration Burden</h1> <div class="tags subtitle"> <a href="/tags/configuration.html">configuration</a>, <a href="/tags/infrastructure.html">infrastructure</a>, <a href="/tags/deployment.html">deployment</a>, <a href="/tags/dhall.html">dhall</a> </div> <p><em>This blogpost was originally posted on the <a href="https://tech.fretlink.com/adding-fun-to-the-configuration-burden/">Fretlink Tech blog</a> while I was working there in 2020</em></p> <p>Did you ever enjoy writing <code>XML</code> files by hand? <em>No</em>, OK, I thought so. Was it better with <code>JSON</code>? <em>No</em>. What about <code>YAML</code> where the indentation is so easy right? <em>No</em>, none of these are enjoyable. The reason for all these <em>no</em> is simple: <strong>formats</strong> are meant to be read or written by machines and not by humans.</p> <p>As computing folks we most probably prefer to write <strong>code</strong> because programming is what gives us the control over machines' behaviour. Follow me into the fabulous world of <a href="https://github.com/dhall-lang/dhall-lang/wiki/Programmable-configuration-files">programmable configuration files</a>. I'm pretty sure your will like it.</p> <p></p> <h2 id=lets-rewrite-our-deployment-configuration>Let's Rewrite our Deployment Configuration</h2> <p>In order to deploy our systems at Fretlink we use Ansible to both configure our machines (the ones we manage ourselves on a public IaaS cloud) and to deploy our services (which are deployed to a public PaaS called <a href="https://www.clever-cloud.com/">Clever-Cloud</a>).</p> <p>Ansible uses <strong>a lot</strong> of YAML. You define your tasks in YAML, you define your machine inventory in YAML and you define variables in YAML. It's easy to reach a <code>ETOOMUCHYAML</code> brain error in this situation.</p> <p>Long story short, our deployments were configured through a set of variables which roughly looked like this in a <code>YAML</code> formatted file:</p> <div class=highlight><pre class="highlight yaml"><code><span class="nn">---</span>
+<span class="c1"># Config related to Clever-Cloud deployment</span>
+<span class="na">clever_app</span><span class="pi">:</span>    <span class="s2">"</span><span class="s">app_1234"</span>
+<span class="na">clever_orga</span><span class="pi">:</span>   <span class="s2">"</span><span class="s">orga_4321"</span>
+<span class="na">clever_secret</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">vault_clever_secret</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="na">clever_token</span><span class="pi">:</span>  <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">vault_clever_token</span><span class="nv"> </span><span class="s">}}"</span>
+
+<span class="na">clever_domian</span><span class="pi">:</span> <span class="s2">"</span><span class="s">service1.staging.example.com"</span>
+
+<span class="na">clever_entry_point</span><span class="pi">:</span> <span class="s2">"</span><span class="s">service-server"</span>
+<span class="na">clever_addons</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">pg"</span>
+    <span class="na">env_prefix</span><span class="pi">:</span> <span class="s2">"</span><span class="s">POSTGRESQL_ADDON"</span>
+<span class="na">clever_env</span><span class="pi">:</span>
+  <span class="na">MACAROON_SECRET</span><span class="pi">:</span>    <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">vault_macaroon_secret</span><span class="nv"> </span><span class="s">}}"</span>
+  <span class="na">EXAMPLE_CLIENT_URL</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://example.org/api/v1/faker"</span>
+  <span class="s">…</span>
+<span class="nn">---</span>
+<span class="c1"># Config related to our web servers</span>
+<span class="na">kong_servers</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">…</span>
+</code></pre></div> <p>The more the team grew, the more frequently we needed to change this configuration. Also, the number of our internal services was going to grow rapidly with many similarities between their configurations. And most importantly, we wanted the effort to be shared amongst the whole tech team. Environment variables are added by developers almost weekly, web server endpoints are added for new services, our system administrators adapt infrastructure related variables from time to time.</p> <p>How could we manage all these changes and prevent typos? (Don't give me that look I know <a href="https://github.com/nvbn/thefuck">you know</a>) How do we avoid repetition knowing that the structure of this config will be reused in all our services? How can we feel safe during a configuration refactoring?</p> <h2 id=down-the-rabbit-hole>Down the Rabbit-Hole</h2> <p>Have you heard about Dhall? Not the <a href="https://thewanderlustkitchen.com/wp-content/uploads/2016/10/quick-red-lentil-dal-dahl-5.jpg">Indian food recipe</a>, the Dhall computer language.</p> <blockquote> <p>Dhall is a programmable configuration language that you can think of as: JSON + functions + types + imports</p> <p>— the <a href="https://dhall-lang.org/">Dhall-lang homepage</a></p> </blockquote> <p>Its homepage sums it up really neatly: It is a nice mix of JSON (or YAML, XML, <a href="https://github.com/dhall-lang/dhall-lang/wiki/How-to-integrate-Dhall#external-executable">…</a>) with <strong>functions + types + imports</strong>.</p> <p>Let's take a peek at each of these three additional elements on top of our common formats.</p> <h3 id=types-why-do-i-need-types-when-i-got-free-form-objects-><strong>Types</strong>: <em>Why do I need types when I got free form objects</em> 🍸</h3> <p>You can optionally type any variable or records in Dhall with a colon. I.e. <code>let clever_app : Text = "app_1234"</code> will define a <code>clever_app</code> variable of type <code>Text</code> which value is <code>"app_1234"</code>. Records can be typed too:</p> <div class=highlight><pre class="highlight haskell"><code><span class="kr">let</span> <span class="n">config</span> <span class="o">:</span> <span class="p">{</span> <span class="n">clever_app</span> <span class="o">:</span> <span class="kt">Text</span> <span class="p">}</span> <span class="o">=</span> <span class="p">{</span> <span class="n">clever_app</span> <span class="o">=</span> <span class="s">"app_1234"</span> <span class="p">}</span>
+</code></pre></div> <p>will define a <code>config</code> variable of type <code>{ clever_app : Text }</code> which value is <code>{ clever_app = "app_1234" }</code>.</p> <p>Having optional types embedded in the configuration language is <strong>key to solving many frustrations</strong> you might have had when writing a configuration in a format like YAML. Really I am not saying this because <a href="https://tech.fretlink.com/about-our-tech/">we like types</a> at Fretlink, I am saying it because it saved us a lot of time. As part of the devoups team, we are expert on text typos and Dhall transforms those into proficient tty-ops. So let's take some time to explain why:</p> <ol> <li> <p>First reason is to ensure type safety <strong>on values</strong>. In a YAML file, for instance, you can write <code>Text</code> values with or without quotes. <code>clever_app: "app_1234"</code> is as valid as <code>clever_app: app_1234</code>. It will even let you write <code>clever_app: 1234</code> and you could imagine that <code>1234</code> will be interpreted as a string. However most systems reading this will parse it as an <code>Integer</code> instead of a <code>Text</code> without you noticing.</p> <caption><i>👋 What could go wrong while summing integers and texts in Javascript?</i></caption> <div class=highlight><pre class="highlight javascript"><code><span class="o">&gt;</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="mi">3</span>
+<span class="o">&gt;</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">1</span><span class="dl">"</span>
+<span class="dl">"</span><span class="s2">21</span><span class="dl">"</span>
+<span class="o">&gt;</span> <span class="mi">1</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">1</span><span class="dl">"</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">1</span><span class="dl">"</span>
+<span class="dl">"</span><span class="s2">111</span><span class="dl">"</span>
+</code></pre></div> </li> <li> <p>Our new anti-typos hero is here to offer type safety <strong>on data structure</strong>. This is where Dhall shines because you can define complex record types where each field name in your record values will be statically checked for free!</p> <p>Did you spot the error in the <code>YAML</code> configuration file earlier on? If you were concentrated and have good eyes you probably did. If you didn't spot it, we made a typo and wrote <code>clever_domian:</code> instead of <code>clever_domain:</code>. Let's let the Dhall language check that for us by defining a <code>CleverConfig</code> type and use it in our configuration:</p> <div class=highlight><pre class="highlight haskell"><code><span class="c1">-- Define our CleverConfig record type</span>
+<span class="kr">let</span> <span class="kt">CleverConfig</span> <span class="o">=</span>
+      <span class="p">{</span> <span class="n">clever_app</span> <span class="o">:</span> <span class="kt">Text</span>
+      <span class="p">,</span> <span class="n">clever_orga</span> <span class="o">:</span> <span class="kt">Text</span>
+      <span class="p">,</span> <span class="n">clever_secret</span> <span class="o">:</span> <span class="kt">Text</span>
+      <span class="p">,</span> <span class="n">clever_token</span> <span class="o">:</span> <span class="kt">Text</span>
+      <span class="p">,</span> <span class="n">clever_domain</span> <span class="o">:</span> <span class="kt">Optional</span> <span class="kt">Text</span>
+      <span class="p">}</span>
+    
+<span class="c1">-- Define our record value of type 'CleverConfig'</span>
+<span class="kr">in</span>    <span class="p">{</span> <span class="n">clever_app</span> <span class="o">=</span> <span class="s">"app_1234"</span>
+      <span class="p">,</span> <span class="n">clever_orga</span> <span class="o">=</span> <span class="s">"orga_4321"</span>
+      <span class="p">,</span> <span class="n">clever_secret</span> <span class="o">=</span> <span class="s">"{{ vault_clever_secret }}"</span>
+      <span class="p">,</span> <span class="n">clever_token</span> <span class="o">=</span> <span class="s">"{{ vault_clever_token }}"</span>
+      <span class="p">,</span> <span class="n">clever_domian</span> <span class="o">=</span> <span class="kt">Some</span> <span class="s">"service1.staging.example.com"</span>
+      <span class="p">}</span>
+    <span class="o">:</span> <span class="kt">CleverConfig</span>
+</code></pre></div> <p>What happens if we ask dhall to type check this expression?</p> <div class=highlight><pre class="highlight plaintext"><code>Error: Expression doesn't match annotation
+
+{ - clever_domain : …
+, + clever_domian : …
+, …
+}
+</code></pre></div> <p>Pretty nice ain't it? <strong>Of course it works with any complex record structure with as many sub-records as you like.</strong></p> </li> </ol> <h3 id=imports-one-single-file-can-do-just-fine-dont-worry-><strong>Imports</strong>: <em>One single file can do just fine don't worry</em> 😁</h3> <p>As you would expect from a traditional programming language you can factorise code into separate files and use imports to link them together. No need for <a href="https://docs.gitlab.com/ce/ci/yaml/#include">each</a> and <a href="https://docs.ansible.com/ansible/latest/modules/include_module.html">every</a> tool to implement their own <code>include:</code> function on top of the formats they use, the feature is embedded in the configuration language itself.</p> <p>Taking our example from above we could then separate the type definition and the configuration record:</p> <center><i><code>CleverConfig.dhall</code> file</i></center> <div class=highlight><pre class="highlight haskell"><code><span class="p">{</span> <span class="n">clever_app</span> <span class="o">:</span> <span class="kt">Text</span>
+<span class="p">,</span> <span class="n">clever_orga</span> <span class="o">:</span> <span class="kt">Text</span>
+<span class="p">,</span> <span class="n">clever_secret</span> <span class="o">:</span> <span class="kt">Text</span>
+<span class="p">,</span> <span class="n">clever_token</span> <span class="o">:</span> <span class="kt">Text</span>
+<span class="p">,</span> <span class="n">clever_domain</span> <span class="o">:</span> <span class="kt">Optional</span> <span class="kt">Text</span>
+<span class="p">}</span>
+</code></pre></div> <center><i><code>clever.dhall</code> file</i></center> <div class=highlight><pre class="highlight haskell"><code><span class="c1">-- Import our record type from a local file</span>
+<span class="kr">let</span> <span class="kt">CleverConfig</span> <span class="o">=</span> <span class="o">./</span><span class="kt">CleverConfig</span><span class="o">.</span><span class="n">dhall</span>
+
+<span class="kr">in</span>    <span class="p">{</span> <span class="n">clever_app</span> <span class="o">=</span> <span class="s">"app_1234"</span>
+      <span class="p">,</span> <span class="n">clever_orga</span> <span class="o">=</span> <span class="s">"orga_4321"</span>
+      <span class="p">,</span> <span class="n">clever_secret</span> <span class="o">=</span> <span class="s">"{{ vault_clever_secret }}"</span>
+      <span class="p">,</span> <span class="n">clever_token</span> <span class="o">=</span> <span class="s">"{{ vault_clever_token }}"</span>
+      <span class="p">,</span> <span class="n">clever_domain</span> <span class="o">=</span> <span class="kt">Some</span> <span class="s">"service1.staging.example.com"</span>
+      <span class="p">}</span>
+    <span class="o">:</span> <span class="kt">CleverConfig</span>
+</code></pre></div> <p>You can import a <code>*.dhall</code> expression from a local file, a remote file or even from an environment variable. Here are the three simple constructs to do so:</p> <ul> <li><code>./types.dhall</code> to load a local file</li> <li><code>https://example.org/types.dhall</code> a simple URL to load a remote file</li> <li><code>env:FOO_VARIABLE</code> load dhall expression from an environment variable (very uncommon way to use imports)</li> </ul> <h3 id=functions-i-dont-need-functions-in-yaml-because-i-have-anchors-and-aliases-><strong>functions</strong>: <em>I don't need functions in YAML because I have anchors and aliases</em> 😎</h3> <p>Did you know YAML let's you define anchors on an object with <code>&amp;anchorName</code> and reuse this object with the alias <code>*anchorName</code>? It's a first step to factorise some common configuration.</p> <div class=highlight><pre class="highlight yaml"><code><span class="s">.common</span><span class="pi">:</span> <span class="nl">&amp;cleverAnchor</span>
+  <span class="na">clever_secret</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">vault_clever_secret</span><span class="nv"> </span><span class="s">}}"</span>
+  <span class="na">clever_token</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">vault_clever_token</span><span class="nv"> </span><span class="s">}}"</span>
+  <span class="na">clever_orga</span><span class="pi">:</span> <span class="s2">"</span><span class="s">orga_4321"</span>
+
+<span class="na">services</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">&lt;&lt;</span><span class="pi">:</span> <span class="nv">*cleverAnchor</span>
+    <span class="na">clever_app</span><span class="pi">:</span> <span class="s2">"</span><span class="s">app_1234"</span>
+    <span class="na">clever_domain</span><span class="pi">:</span> <span class="s2">"</span><span class="s">service1.staging.example.com"</span>
+  <span class="pi">-</span> <span class="s">&lt;&lt;</span><span class="pi">:</span> <span class="nv">*cleverAnchor</span>
+    <span class="na">clever_app</span><span class="pi">:</span> <span class="s2">"</span><span class="s">app_6789"</span>
+    <span class="na">clever_domain</span><span class="pi">:</span> <span class="s2">"</span><span class="s">service2.staging.example.com"</span>
+</code></pre></div> <p>In a more programmatic way we could define a constructor function and call it for each service. Such a Dhall function would look like this:</p> <div class=highlight><pre class="highlight haskell"><code><span class="c1">-- Reuse our CleverConfig type defined earlier</span>
+<span class="kr">let</span> <span class="kt">CleverConfig</span> <span class="o">=</span> <span class="o">./</span><span class="kt">CleverConfig</span><span class="o">.</span><span class="n">dhall</span>
+
+<span class="c1">-- Function definition</span>
+<span class="kr">let</span> <span class="n">mkConfig</span> <span class="o">=</span>
+        <span class="err">λ</span><span class="p">(</span><span class="n">app</span> <span class="o">:</span> <span class="kt">Text</span><span class="p">)</span>
+      <span class="err">→</span> <span class="err">λ</span><span class="p">(</span><span class="n">domain</span> <span class="o">:</span> <span class="kt">Optional</span> <span class="kt">Text</span><span class="p">)</span>
+      <span class="err">→</span>   <span class="p">{</span> <span class="n">clever_app</span> <span class="o">=</span> <span class="n">app</span>
+          <span class="p">,</span> <span class="n">clever_orga</span> <span class="o">=</span> <span class="s">"orga_4321"</span>
+          <span class="p">,</span> <span class="n">clever_secret</span> <span class="o">=</span> <span class="s">"{{ vault_clever_secret }}"</span>
+          <span class="p">,</span> <span class="n">clever_token</span> <span class="o">=</span> <span class="s">"{{ vault_clever_token }}"</span>
+          <span class="p">,</span> <span class="n">clever_domain</span> <span class="o">=</span> <span class="n">domain</span>
+          <span class="p">}</span>
+        <span class="o">:</span> <span class="kt">CleverConfig</span>
+
+<span class="kr">in</span>  <span class="p">{</span> <span class="n">services</span> <span class="o">=</span>
+        <span class="p">[</span> <span class="n">mkConfig</span> <span class="s">"app_1234"</span> <span class="p">(</span><span class="kt">Some</span> <span class="s">"service1.staging.example.com"</span><span class="p">)</span>
+        <span class="p">,</span> <span class="n">mkConfig</span> <span class="s">"app_6789"</span> <span class="p">(</span><span class="kt">Some</span> <span class="s">"service2.staging.example.com"</span><span class="p">)</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+</code></pre></div> <p>That's our syntax to write functions in Dhall:</p> <p><code>λ(…a typed parameter…) → λ(…another parameter…) → …function body…</code></p> <p>(Don't worry you don't <em>need</em> to use the λ and → Unicode characters, you can replace them with <code>\</code> and <code>-&gt;</code> respectively)</p> <h2 id=o-no-more-yaml-woop-woop-o>\o\ No More <code>YAML</code> Woop Woop /o/</h2> <p>We thus decided to use Dhall to replace the deployment steps of our services' continuous integration workflow. It was a perfect place to start as those configuration lie in each of our service's repository and we want everybody to be able to make changes to it (not only the <em>devoups</em> team).</p> <p>We were so happy with our new toy that we started using functions, imports and types everywhere in order to transform this <code>YAML</code> configuration into <em>awesome code</em>. We wanted to make it generic, we wanted to make it look like software.</p> <p>However, we quickly realised we had lost ourselves and ended up having a wonderful world of type-safe configuration but more importantly a <strong>completely un-maintainable one</strong>.</p> <center><i>Logic everywhere, such wow, much complex</i></center> <div class=highlight><pre class="highlight plaintext"><code>dhall/
+├── deployment
+│   ├── ansible
+│   │   ├── hosts
+│   │   ├── mkClever.dhall
+│   │   └── mkKong.dhall
+│   ├── Global.dhall
+│   ├── mkConfigs.dhall
+│   ├── mkGlobal.dhall
+│   ├── mkPG.dhall
+│   ├── mkVault.dhall
+│   ├── Types.dhall
+│   ├── Vault.dhall
+│   └── vault.dummy.dhall
+├── external-functions.dhall
+├── external-types.dhall
+├── Makefile
+├── production
+│   ├── clever.dhall
+│   ├── Configs.dhall
+│   ├── hosts.dhall
+│   ├── kong.dhall
+│   ├── pg.dhall
+│   └── vault.dhall.enc
+├── production.dhall
+├── staging
+│   ├── clever.dhall
+│   ├── Configs.dhall
+│   ├── hosts.dhall
+│   ├── kong.dhall
+│   ├── pg.dhall
+│   └── vault.dhall.enc
+├── staging.dhall
+└── shell.nix
+
+4 directories, 30 files
+</code></pre></div> <p>Yes, yes, this is the directory structure of our first try at using Dhall to replace 62 lines of <code>YAML</code> (31 lines per env, staging and production).</p> <p>With this kind of configuration in place, what happens when someone wants to <em>change the staging environment Kong configuration</em> for instance? We could think it's easy and go into the <code>dhall/staging/kong.dhall</code> file right? Well not really because it contains only generic logic to call a function called <code>mkKong</code> with the <code>Staging</code> environment type as input parameter. Ok, let's open the file <code>dhall/deployment/ansible/mkKong.dhall</code> then. Again we can't find the URL we wanted to change initially. This is becoming <em>annoying</em>, to say it politely. Apparently the URL is given by the <code>mkGlobal</code> function. Let's look in the <code>dhall/deployment/mkGlobal.dhall</code> file. Victory! The configuration change we wanted to do can be done here. 😅</p> <p>You understood, we had clearly gone too far. Worst of all, our devoups team member couldn't make a quick change in case of a production emergency. This was really not what we had intended.</p> <h2 id=back-to-basics>Back to Basics</h2> <p>Our main goal had always been to enhance our team work on configuration changes and make it much more friendly to look at, even for newcomers, and much more safe to update. We knew Dhall would help by giving us all the nice features mentioned above. But we still didn't know how to mold it to our needs. After a few internal discussions, improvements in the dhall language along the way (E.g. support for <a href="https://github.com/dhall-lang/dhall-lang/pull/689">mixed kinds records</a> giving the ability to encapsulate Types and record values into one single record helped us to build easily exportable “packages”) and incremental changes in our code we finally found our sweet spot.</p> <p>One of the key insights was to focus on <strong>avoiding the usage of functions to build records</strong>. Instead we focused on offering abstraction layers which take as inputs a plain old record of all needed values. Of course we still want to hide some field names that are specific to our tools, but with just enough abstraction to still give flexibility to the underlying service configuration's need.</p> <p>In our case this translated into implementing two abstraction layers:</p> <ul> <li>Dhall “interfaces” inside our Ansible roles (we have one for the Clever-Cloud configuration and another one for the Kong configuration) which exports generic types and their associated constructors in order to match the role's available configuration.</li> <li>A common Fretlink dedicated layer to gather our services' defaults into one place. This common layer being responsible to manipulate the generic types inherited from our Ansible roles and export helper functions to the services. For example, parts of the configuration which are not directly interesting for developers can be hiden away inside <em>default</em> (or <em>common</em>) constructor functions.</li> </ul> <p>Enough talking, let's dig into the example for the Clever configuration part of our <code>YAML</code> deployment configuration defined in the beginning of the article.</p> <center><i><code>ansible/inventories/staging/group_vars/all/vars.yml</code></i></center> <div class=highlight><pre class="highlight yaml"><code><span class="nn">---</span>
+<span class="c1"># Config related to Clever-Cloud deployment</span>
+<span class="na">clever_app</span><span class="pi">:</span>     <span class="s2">"</span><span class="s">app_1234"</span>
+<span class="na">clever_orga</span><span class="pi">:</span>    <span class="s2">"</span><span class="s">orga_4321"</span>
+<span class="na">clever_secret</span><span class="pi">:</span>  <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">vault_clever_secret</span><span class="nv"> </span><span class="s">}}"</span>
+<span class="na">clever_token</span><span class="pi">:</span>   <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">vault_clever_token</span><span class="nv"> </span><span class="s">}}"</span>
+
+<span class="na">clever_domain</span><span class="pi">:</span> <span class="s2">"</span><span class="s">service1.staging.example.com"</span>
+
+<span class="na">clever_entry_point</span><span class="pi">:</span> <span class="s2">"</span><span class="s">service-server"</span>
+<span class="na">clever_addons</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">pg"</span>
+    <span class="na">env_prefix</span><span class="pi">:</span> <span class="s2">"</span><span class="s">POSTGRESQL_ADDON"</span>
+<span class="na">clever_env</span><span class="pi">:</span>
+  <span class="na">MACAROON_SECRET</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">vault_macaroon_secret</span><span class="nv"> </span><span class="s">}}"</span>
+  <span class="na">EXAMPLE_CLIENT_URL</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://example.org"</span>
+  <span class="s">…</span>
+</code></pre></div> <p>The generic Clever related layer describes record types with their constructors and is maintained as part of the Ansible role:</p> <center><i><code>https://raw.githubusercontent.com/fretlink/ansible-clever/master/dhall/package.dhall</code></i></center> <div class=highlight><pre class="highlight haskell"><code><span class="kr">let</span> <span class="kt">Addon</span> <span class="o">=</span>
+      <span class="o">&lt;</span> <span class="kt">Postgresql</span> <span class="o">:</span> <span class="p">{</span> <span class="n">name</span> <span class="o">:</span> <span class="kt">Text</span><span class="p">,</span> <span class="n">env_prefix</span> <span class="o">:</span> <span class="kt">Text</span> <span class="p">}</span>
+      <span class="o">|</span> <span class="kt">Redis</span> <span class="o">:</span> <span class="p">{</span> <span class="n">name</span> <span class="o">:</span> <span class="kt">Text</span><span class="p">,</span> <span class="n">env_prefix</span> <span class="o">:</span> <span class="kt">Text</span> <span class="p">}</span>
+      <span class="c1">-- … all compatible Clever addons</span>
+      <span class="o">&gt;</span>
+
+<span class="kr">let</span> <span class="kt">Config</span> <span class="o">=</span>
+      <span class="p">{</span> <span class="n">clever_app</span> <span class="o">:</span> <span class="kt">Text</span>
+      <span class="p">,</span> <span class="n">clever_orga</span> <span class="o">:</span> <span class="kt">Text</span>
+      <span class="p">,</span> <span class="n">clever_secret</span> <span class="o">:</span> <span class="kt">Text</span>
+      <span class="p">,</span> <span class="n">clever_token</span> <span class="o">:</span> <span class="kt">Text</span>
+      <span class="p">,</span> <span class="n">clever_domain</span> <span class="o">:</span> <span class="kt">Optional</span> <span class="kt">Text</span>
+      <span class="p">,</span> <span class="n">clever_entry_point</span> <span class="o">:</span> <span class="kt">Optional</span> <span class="kt">Text</span>
+      <span class="p">,</span> <span class="n">clever_addons</span> <span class="o">:</span> <span class="kt">List</span> <span class="kt">Addon</span>
+      <span class="p">,</span> <span class="n">clever_env</span> <span class="o">:</span> <span class="p">{}</span>
+      <span class="p">}</span>
+
+<span class="kr">let</span> <span class="n">mkConfig</span> <span class="o">=</span>
+        <span class="err">λ</span><span class="p">(</span><span class="n">vault</span> <span class="o">:</span> <span class="kt">Vault</span><span class="p">)</span>
+      <span class="err">→</span> <span class="err">λ</span><span class="p">(</span><span class="n">app</span> <span class="o">:</span> <span class="kt">Text</span><span class="p">)</span>
+      <span class="err">→</span> <span class="err">λ</span><span class="p">(</span><span class="n">organization</span> <span class="o">:</span> <span class="kt">Text</span><span class="p">)</span>
+      <span class="err">→</span>   <span class="p">{</span> <span class="n">clever_app</span> <span class="o">=</span> <span class="n">app</span>
+          <span class="p">,</span> <span class="n">clever_orga</span> <span class="o">=</span> <span class="n">organization</span>
+          <span class="p">,</span> <span class="n">clever_secret</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">secret</span>
+          <span class="p">,</span> <span class="n">clever_token</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">token</span>
+          <span class="p">,</span> <span class="n">clever_domain</span> <span class="o">=</span> <span class="kt">None</span> <span class="kt">Text</span>
+          <span class="p">,</span> <span class="n">clever_entry_point</span> <span class="o">=</span> <span class="kt">None</span> <span class="kt">Text</span>
+          <span class="p">,</span> <span class="n">clever_addons</span> <span class="o">=</span> <span class="kt">[]</span> <span class="o">:</span> <span class="kt">List</span> <span class="kt">Addon</span>
+          <span class="p">,</span> <span class="n">clever_env</span> <span class="o">=</span> <span class="p">{</span><span class="o">=</span><span class="p">}</span>
+          <span class="p">}</span>
+        <span class="o">:</span> <span class="kt">Config</span>
+
+<span class="kr">in</span>  <span class="p">{</span> <span class="kt">Config</span> <span class="o">=</span>
+        <span class="p">{</span> <span class="kt">Type</span> <span class="o">=</span> <span class="kt">Config</span>
+        <span class="p">,</span> <span class="n">mkConfig</span> <span class="o">=</span> <span class="n">mkConfig</span>
+        <span class="p">}</span>
+    <span class="p">,</span> <span class="kt">Addon</span> <span class="o">=</span>
+        <span class="p">{</span> <span class="kt">Type</span> <span class="o">=</span> <span class="kt">Addon</span>
+        <span class="p">,</span> <span class="n">postgresql</span> <span class="o">=</span>
+            <span class="kt">Addon</span><span class="o">.</span><span class="kt">Postgresql</span> <span class="p">{</span> <span class="n">name</span> <span class="o">=</span> <span class="s">"pg"</span><span class="p">,</span> <span class="n">env_prefix</span> <span class="o">=</span> <span class="s">"POSTGRESQL_ADDON"</span> <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+</code></pre></div> <p>Then, the Fretlink abstraction layer exposes a <code>mkDefaultConfig</code> function which fits with our services' defaults:</p> <center><i><code>https://commons.fretlink.com/package.dhall</code></i></center> <div class=highlight><pre class="highlight haskell"><code><span class="c1">-- Import the role package</span>
+<span class="kr">let</span> <span class="kt">Clever</span> <span class="o">=</span> <span class="n">https</span><span class="o">://</span><span class="n">raw</span><span class="o">.</span><span class="n">githubusercontent</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">fretlink</span><span class="o">/</span><span class="n">ansible</span><span class="o">-</span><span class="n">clever</span><span class="o">/</span><span class="n">master</span><span class="o">/</span><span class="n">dhall</span><span class="o">/</span><span class="n">package</span><span class="o">.</span><span class="n">dhall</span>
+
+<span class="c1">--</span>
+<span class="c1">-- variables hidden away for clarity in this article</span>
+<span class="c1">--     (Environment, ApplicationData and mkDefaultEnv)</span>
+<span class="c1">--</span>
+
+<span class="kr">let</span> <span class="n">mkDefaultConfig</span> <span class="o">=</span>
+        <span class="err">λ</span><span class="p">(</span><span class="n">environment</span> <span class="o">:</span> <span class="kt">Environment</span><span class="p">)</span>
+      <span class="err">→</span> <span class="err">λ</span><span class="p">(</span><span class="n">appData</span> <span class="o">:</span> <span class="kt">ApplicationData</span><span class="p">)</span>
+      <span class="err">→</span> <span class="kr">let</span> <span class="n">defaultAddons</span> <span class="o">=</span> <span class="p">[</span> <span class="kt">Clever</span><span class="o">.</span><span class="kt">Addon</span><span class="o">.</span><span class="n">postgresql</span> <span class="p">]</span>
+
+        <span class="kr">let</span> <span class="n">baseData</span> <span class="o">:</span> <span class="kt">Clever</span><span class="o">.</span><span class="kt">Config</span><span class="o">.</span><span class="kt">Type</span>
+            <span class="o">=</span> <span class="kt">Clever</span><span class="o">.</span><span class="kt">Config</span><span class="o">.</span><span class="n">mkConfig</span>
+                <span class="n">appData</span><span class="o">.</span><span class="n">cleverSecrets</span>
+                <span class="n">appData</span><span class="o">.</span><span class="n">appId</span>
+                <span class="n">appData</span><span class="o">.</span><span class="n">orgId</span>
+
+        <span class="kr">in</span>    <span class="n">baseData</span>
+            <span class="c1">-- Merge Fretlink defaults with the '∧' operator</span>
+            <span class="err">∧</span> <span class="p">{</span> <span class="n">clever_entry_point</span> <span class="o">=</span> <span class="n">appData</span><span class="o">.</span><span class="n">entryPoint</span>
+              <span class="p">,</span> <span class="n">clever_domain</span> <span class="o">=</span> <span class="n">appData</span><span class="o">.</span><span class="n">domain</span>
+              <span class="p">,</span> <span class="n">clever_addons</span> <span class="o">=</span> <span class="n">appData</span><span class="o">.</span><span class="n">additionalAddons</span>
+              <span class="p">,</span> <span class="n">clever_env</span> <span class="o">=</span> <span class="n">mkDefaultEnv</span> <span class="n">environment</span> <span class="n">appData</span>
+              <span class="p">}</span>
+
+<span class="kr">in</span>  <span class="p">{</span> <span class="kt">Clever</span> <span class="o">=</span> <span class="p">{</span> <span class="n">mkDefaultConfig</span> <span class="o">=</span> <span class="n">mkDefaultConfig</span> <span class="p">}</span> <span class="p">}</span>
+
+</code></pre></div> <p>And finally the Dhall code within the service repository which generates the exact same YAML defined above:</p> <div class=highlight><pre class="highlight haskell"><code><span class="c1">-- Import the Fretlink dhall commons package</span>
+<span class="kr">let</span> <span class="kt">Fretlink</span> <span class="o">=</span> <span class="n">https</span><span class="o">://</span><span class="n">commons</span><span class="o">.</span><span class="n">fretlink</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">package</span><span class="o">.</span><span class="n">dhall</span>
+
+<span class="kr">in</span>    <span class="kt">Fretlink</span><span class="o">.</span><span class="kt">Clever</span><span class="o">.</span><span class="n">mkDefaultConfig</span>
+        <span class="p">(</span><span class="kt">Staging</span> <span class="p">{</span><span class="o">=</span><span class="p">})</span>
+        <span class="p">{</span> <span class="n">cleverSecrets</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">clever</span>
+        <span class="p">,</span> <span class="n">serviceSecrets</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">service</span>
+        <span class="p">,</span> <span class="n">appId</span> <span class="o">=</span> <span class="s">"app_1234"</span>
+        <span class="p">,</span> <span class="n">orgId</span> <span class="o">=</span> <span class="s">"orga_4321"</span>
+        <span class="p">,</span> <span class="n">entryPoint</span> <span class="o">=</span> <span class="s">"service-server"</span>
+        <span class="p">,</span> <span class="n">domain</span> <span class="o">=</span> <span class="s">"service1.staging.example.com"</span>
+        <span class="p">}</span>
+    <span class="c1">-- Merge service specific configuration with the '∧' operator</span>
+    <span class="err">∧</span> <span class="p">{</span> <span class="n">clever_env</span> <span class="o">=</span> <span class="p">{</span> <span class="kt">EXAMPLE_CLIENT_URL</span> <span class="o">=</span> <span class="s">"https://example.org"</span> <span class="p">}</span> <span class="p">}</span>
+</code></pre></div> <p>What do we notice here? Parts of the configuration is abstracted away such as:</p> <ul> <li>the details of <code>clever_secret</code> and <code>clever_token</code> fields are replaced by a unique <code>cleverSecrets</code> record (which is typed in the <code>vault</code> variable to make sure it includes the secret and the token)</li> <li>the details of <code>clever_addons</code> is completely missing. Why? Because, by default, all of our services have a PostgreSQL addon and this logic is received by the Fretlink common layer.</li> <li>parts of the details of <code>clever_env</code> is missing. Why? Similarly to the previous point, by default all of our services have a <code>MACAROON_SECRET</code> variable and the Fretlink common layer construct it for us.</li> </ul> <p>With these dhall files you can discover the <code>∧</code> operator (don't worry you can write <code>/\</code> without Unicode) which is a way to recursively merge records. I.e. the <code>mkDefaultConfig</code> function produces a record which already has a <code>clever_env</code> keyed value and we “override” it by merging a record with the same <code>clever_env</code> key containing the service specific values.</p> <p>If we take a look at our new directory structure, it feels much more welcoming and understandable.</p> <div class=highlight><pre class="highlight plaintext"><code>deployment/
+├── import.dhall
+├── Makefile
+├── production
+│   ├── configuration.dhall
+│   └── vault.dhall.enc
+├── production.dhall
+├── staging
+│   ├── configuration.dhall
+│   └── vault.dhall.enc
+├── staging.dhall
+├── shell.nix
+└── Vault.dhall
+
+2 directories, 15 files
+</code></pre></div> <p>Overall all the important configuration values for each environment are now in <strong>one single file</strong>. Generic logic which doesn't hold project specific configuration is abstracted away and included via the <code>import.dhall</code> file. Now, if we want to <em>change the staging environment Kong configuration</em> we can simply open up the <code>deployment/staging/configuration.dhall</code> file and be sure to find everything related to the <code>Staging</code> environment and specific to our service in there. ☺️</p> <h2 id=going-even-further>Going even Further</h2> <p>Removing Ansible's specificities from the configuration was achieved ✓.</p> <p>On top of the improvements mentioned above, this also means we don't even need to worry about each tools' templating engine (in our case, no need to use Ansible's Jinja templating engine anymore 🤩). With Dhall we have a fully fledged functional programming language and text interpolation if needed. If you are curious about the Dhall syntax for text interpolation within strings it is done with <code>${variable}</code>.</p> <div class=highlight><pre class="highlight haskell"><code><span class="kr">let</span> <span class="n">planet</span> <span class="o">=</span> <span class="s">"earth"</span>
+
+<span class="kr">let</span> <span class="n">greeting</span> <span class="o">=</span> <span class="s">"Hello ${planet}"</span>
+
+<span class="kr">in</span>  <span class="n">greeting</span>
+</code></pre></div> <p>will result in the string <code>"Hello earth"</code>.</p> <p>However we still had our secret variables inside Ansible specific encrypted files. Did you notice the <code>vault.dhall.enc</code> files in the resulting directory structure of our deployment configuration? In order to try to be a bit less tied up to Ansible, and replace its <code>ansible-vault</code> binary, we decided to use a more common encryption tool: <code>openssl-enc</code>.</p> <p>These are our encrypting/decryption tasks which are enough to fill this need (GNU Make syntax):</p> <div class=highlight><pre class="highlight make"><code><span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">encrypt</span>
+<span class="nl">encrypt</span><span class="o">:</span> <span class="c">##</span><span class="nf"> make encrypt ENVIRONMENT_NAME=staging </span><span class="c">#</span><span class="nf"> Encrypt the dhall $(ENVIRONMENT_NAME)/vault.dhall file with the VAULT_PASS_$(ENVIRONMENT_NAME) secret</span>
+	openssl enc <span class="nt">-aes-256-cbc</span> <span class="nt">-md</span> sha256 <span class="se">\</span>
+        <span class="nt">-pass</span> <span class="s2">"env:VAULT_PASS_</span><span class="nv">$(ENVIRONMENT_NAME)</span><span class="s2">"</span> <span class="se">\</span>
+        <span class="nt">-in</span> <span class="s2">"</span><span class="nv">$(ENVIRONMENT_NAME)</span><span class="s2">/vault.dhall"</span> <span class="se">\</span>
+        <span class="nt">-out</span> <span class="s2">"</span><span class="nv">${ENVIRONMENT_NAME}</span><span class="s2">/vault.dhall.enc"</span> <span class="se">\</span>
+        <span class="nt">-base64</span>
+
+<span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">decrypt</span>
+<span class="nl">decrypt</span><span class="o">:</span> <span class="c">##</span><span class="nf"> make decrypt ENVIRONMENT_NAME=staging </span><span class="c">#</span><span class="nf"> Decrypt the encrypted $(ENVIRONMENT_NAME)/vault.dhall.enc file with the VAULT_PASS_$(ENVIRONMENT_NAME) secret</span>
+	openssl enc <span class="nt">-d</span> <span class="nt">-aes-256-cbc</span> <span class="nt">-md</span> sha256 <span class="se">\</span>
+        <span class="nt">-pass</span> <span class="s2">"env:VAULT_PASS_</span><span class="nv">$(ENVIRONMENT_NAME)</span><span class="s2">"</span> <span class="se">\</span>
+        <span class="nt">-in</span> <span class="s2">"</span><span class="nv">$(ENVIRONMENT_NAME)</span><span class="s2">/vault.dhall.enc"</span> <span class="se">\</span>
+        <span class="nt">-out</span> <span class="s2">"</span><span class="nv">$(ENVIRONMENT_NAME)</span><span class="s2">/vault.dhall"</span> <span class="se">\</span>
+        <span class="nt">-base64</span>
+</code></pre></div> <h2 id=this-is-too-good-to-be-true>This is Too Good to be True</h2> <p>I could finish this article without mentioning any downsides of Dhall, but that would make you doubt all the positives. OK, so what are the pitfalls of using Dhall?</p> <p>Well, in order to enjoy type checking, data structure checking, factorisation on any configuration files you will <strong>need a build process</strong>. Indeed from the <code>.dhall</code> source code you will need to run the <code>dhall-to-*</code> executable (where <code>*</code> stands for any formats for which a <a href="https://github.com/dhall-lang/dhall-lang/wiki/How-to-integrate-Dhall#external-executable">conversion executable exist</a>) to generate the end configuration file.</p> <p>For instance, most available continuous integration services out there will ask for a <code>*.yml</code> file in your git repository (<code>.circleci/config.yml</code>, <code>.gitlab-ci.yml</code>, Github Actions, …) so you can forget about running your automatic builds using Dhall only. Of course your could set a local build hook to generate the <code>*.yml</code> file before commiting but that would defeat the “full automation” purpose of continuous integration tools.</p> <p>To mitigate this pitfall, lots of different language community based libraries offer an implementation of the Dhall language of their own. So you could enjoy Dhall to configure your <a href="https://github.com/Nadrieril/dhall-rust">Rust</a> service, your <a href="https://git.sr.ht/~singpolyma/dhall-ruby">Ruby</a> service or your <a href="https://github.com/dhall-lang/dhall-haskell">Haskell</a> service (Dhall-lang's official implementation is the Haskell one so, that was easy 👌). With this in mind you can directly read your Dhall configuration within your own codebase without the need to generate any intermediate JSON or YAML files. Oh boy, is this Dhall language real after all?</p> <p>I hope I convinced you to give it a try. Dhall language is continuously evolving thanks to the wonderful work of <a href="https://github.com/Gabriel439">Gabriel Gonzalez</a> and the dhall community. Once you arrived in <em>the good place</em> you'll never want to go back to writing in primitive machine formats.</p> <p>Have fun, stay free and stay kind.</p> <p>✨</p> <style>
+  .post-full-content p code { word-break: break-word !important; white-space: nowrap; }
+</style> </article> <div id=disqus_thread></div> <script>
+//<![CDATA[
+                  var disqus_shortname = 'paul-bonaud-fr';
+          
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+//]]>
+</script> <noscript>Please enable JavaScript to view the <a href='http://disqus.com/?ref_noscript'>comments powered by Disqus.</a></noscript> <a href='http://disqus.com' class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a> <script>
+//<![CDATA[
+    var disqus_shortname = 'paul-bonaud-fr';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+//]]>
+</script> <div id=footer> <p></p> <div class=loader> <div id=wave class=send-placeholder> 👋 🐻 👋 </div> <a href="https://gitlab.com/paulrbr/paulrbr.gitlab.io/builds" target=_blank> <div class=send> <div class=send-indicator> <div class=send-indicator-dot></div> <div class=send-indicator-dot></div> <div class=send-indicator-dot></div> <div class=send-indicator-dot></div> </div> <button class=send-button> <div class=sent-bg></div> <i class="fa fa-check sent-icon"></i> </button> </div> </a> </div> <div class=legal> This site's source code is under <a href="https://gitlab.com/paulrbr/paulrbr.gitlab.io/blob/master/LICENSE" rel="AGPL License">AGPL</a> license and available on <a href="https://gitlab.com/paulrbr/paulrbr.gitlab.io">Gitlab</a> or <a href="https://github.com/paulRbr/paulrbr.gitlab.io">Github</a>. </div> </div> </body> </html>

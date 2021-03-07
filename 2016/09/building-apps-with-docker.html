@@ -1,0 +1,92 @@
+<!doctype html> <html> <head> <meta charset=utf-8 /> <meta name=description content="Docker all the things \o/ You have probably seen people running all kind of things inside containers. Anything really, like a famous UI editor or a Tor relay for example. When it comes to a server stack, some people would like to see Docker containers running in production everywhere. It can be a great idea if your production infrastructure is designed to run containers. What if you still run dedicated instances or bare metal machines? Would you even want to use it? "> <meta name=viewport content="width=device-width, initial-scale=1"> <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1"> <title>Ruby build pipeline with Docker</title> <link rel=alternate type="application/atom+xml" title="Atom Feed" href="/feed.xml"/> <link href="../../stylesheets/all.css" rel=stylesheet /><link href="../../stylesheets/color-syntax.css" rel=stylesheet /><link href="../../stylesheets/send.css" rel=stylesheet /> <script src="../../javascripts/all.js"></script><script src="../../javascripts/search.js"></script><script src="../../javascripts/live.js"></script> </head> <body class="x2016 x2016_09 x2016_09_building-apps-with-docker"> <aside> <div class=welcome> <h1><a href="/">Paul Bonaud</a></h1> <div class="summary subtitle"> Passionate about code, challenges and automated systems </div> </div> <div id=menu> <ul class=flat-ul> <li><a href="/">Blog</a></li> <li><a href="/talks.html">Talks</a></li> <li><a href="/about.html">About</a></li> <li><a href="/cv.pdf" target=_blank>Resume</a></li> </ul> </div> <div id=social> <ul class=flat-ul> <li><a rel=me href="https://mastodon.social/@paulrbr"><img src="../../images/mastodon.svg" alt=mastodon class=svg /></a></li> <li><a rel=me href="https://twitter.com/paulrb_r"><img src="../../images/twitter.svg" alt=twitter class=svg /></a></li> <li><a rel=me href="https://pgp.mit.edu/pks/lookup?search=paul+bonaud&op=index"><img src="../../images/mail.png" alt=email /></a></li> <li><a rel=me href="https://gitlab.com/paulrbr"><img src="../../images/gitlab.svg" alt=gitlab class=svg /></a></li> <li><a rel=me href="https://github.com/paulrbr"><img src="../../images/github.svg" alt=github class=svg /></a></li> </ul> </div> </aside> <article id=main role=main> <div class=date>Sep 3rd, 2016</div> <h1>Ruby build pipeline with Docker</h1> <div class="tags subtitle"> <a href="/tags/docker.html">docker</a>, <a href="/tags/build.html">build</a>, <a href="/tags/artifacts.html">artifacts</a>, <a href="/tags/ruby.html">ruby</a> </div> <h2 id=docker-all-the-things-o>Docker all the things \o/</h2> <p>You have probably seen people running all kind of things inside containers. Anything really, like a <a href="http://blog.amosti.net/untitlrun-githubs-atom-editor-in-docker-aka-containers-on-the-desktoped/">famous UI editor</a> or a <a href="https://blog.jessfraz.com/post/running-a-tor-relay-with-docker/">Tor relay</a> for example.</p> <p>When it comes to a server stack, some people would like to see Docker containers running in production everywhere. It can be a great idea if your production infrastructure is designed to run containers.</p> <p>What if you still run dedicated instances or bare metal machines? Would you even want to use it?</p> <p></p> <h2 id=a-realistic-and-proven-use-case>A realistic and proven use-case</h2> <p>Imagine your stack is composed of different OS versions, with apps running on various languages. Do you really want one build runner per OS? Do you want to setup every new build runner with all possible languages your dev team is using?</p> <p>My friend and colleague <a href="https://twitter.com/pmorinerie">Pierre</a> explained really well in <a href="https://captaintrain.com">Captain Train</a>'s blog <a href="https://blog.captaintrain.com/12703-building-on-gitlab-ci">our current build process</a>. Where Docker helps us to have:</p> <blockquote> <ul> <li>Every build is isolated from the others, and processes don’t crash each other randomly.</li> <li>Building the same project on different architectures is easy, and that’s good news, because we need this to support multiple Debian versions.</li> <li>Project maintainers have greater control on the setup of their build environment: no need to bother an admin when upgrading an SDK on the shared build machine.</li> </ul> </blockquote> <p>Running all of your build pipelines <em>- CI, CD, you name it -</em> inside containers might be a good idea for you too. Try it out!</p> <h2 id=a-bumpy-ride>A bumpy ride</h2> <p><em><strong>EDIT</strong>: The following paragraph solving a possible error with bundler has now been <a href="https://github.com/bundler/bundler/commit/713e7711dc506751966a3abd86340e284ebc6a95">fixed</a> in version <code>1.13.2</code> of <code>bundler</code>.</em></p> <p>I am not trying to tell you it is plain easy and straightforward to build in containers. You will probably have some ajustements to make on the road. I will detail here the ride to build ruby apps inside a container.</p> <p>Let's consider the target machine requirements to be <code>ruby:2.3.1</code> and <code>debian:8</code>.</p> <p>The app's build pipeline will be:</p> <ul> <li>build our ruby app inside a Docker container.</li> <li>test it inside the container.</li> <li>package the app from inside the container.</li> </ul> <p>Our ruby app of choice for this example is <code>rake</code>.</p> <p>Let's get started by describing our app environment.</p> <div class=highlight><pre class="highlight docker"><code><span class="c"># Dockerfile</span>
+<span class="c"># --</span>
+<span class="c">#</span>
+<span class="c"># Debian 8 Jessie base image (https://github.com/docker-library/ruby/blob/master/2.3/Dockerfile#L1)</span>
+<span class="k">FROM</span><span class="s"> ruby:2.3</span>
+
+<span class="k">WORKDIR</span><span class="s"> /app</span>
+<span class="c"># Make sure bundle config is kept in workdir</span>
+<span class="k">ENV</span><span class="s"> BUNDLE_APP_CONFIG /app/.bundle/</span>
+
+<span class="c"># Our app</span>
+<span class="k">RUN </span>bundle init
+<span class="k">RUN </span><span class="nb">echo</span> <span class="s2">"gem 'rake'"</span> <span class="o">&gt;&gt;</span> Gemfile
+<span class="k">RUN </span>bundle
+<span class="k">RUN </span>bundle <span class="nt">--deployment</span>
+
+<span class="c"># How to run the app</span>
+<span class="k">ENTRYPOINT</span><span class="s"> ["bundle", "exec", "rake"]</span>
+</code></pre></div> <p>The build process is as simple as building the Docker image:</p> <div class=highlight><pre class="highlight shell"><code><span class="o">&gt;</span> docker build <span class="nt">-t</span> rake <span class="nb">.</span>
+...
+</code></pre></div> <p>Let's run some tests on the app.</p> <div class=highlight><pre class="highlight shell"><code><span class="o">&gt;</span> docker run <span class="nt">-p</span> 8000:8000 <span class="se">\</span>
+<span class="o">&gt;</span> rake <span class="nt">-rwebrick</span> <span class="nt">-e</span> <span class="s2">"WEBrick::HTTPServer.new(Port: 8000, DocumentRoot: '.').start"</span>
+<span class="o">[</span>2016-09-02 23:22:27] INFO  WEBrick 1.3.1
+<span class="o">[</span>2016-09-02 23:22:27] INFO  ruby 2.3.1 <span class="o">(</span>2016-04-26<span class="o">)</span> <span class="o">[</span>x86_64-linux]
+<span class="o">[</span>2016-09-02 23:22:27] INFO  WEBrick::HTTPServer#start: <span class="nv">pid</span><span class="o">=</span>1 <span class="nv">port</span><span class="o">=</span>8000
+
+<span class="o">&gt;</span> curl <span class="nt">-I</span> localhost:8000
+HTTP/1.1 200 OK
+Server: WEBrick/1.3.1 <span class="o">(</span>Ruby/2.3.1/2016-04-26<span class="o">)</span>
+...
+</code></pre></div> <p>Everything is working as expected. Let's package our amazing app now:</p> <div class=highlight><pre class="highlight shell"><code><span class="o">&gt;</span> docker run <span class="nt">--entrypoint</span> <span class="nb">tar </span>rake <span class="nt">--create</span> <span class="nb">.</span> <span class="o">&gt;</span> app.tar
+</code></pre></div> <p>That's great because we now have our app packaged into a tar archive and ready to be deployed anywhere we want.</p> <p>Time to get the app into production on our machine:</p> <div class=highlight><pre class="highlight shell"><code><span class="o">&gt;</span> <span class="nb">tar</span> <span class="nt">--extract</span> <span class="nt">--file</span> app.tar
+
+<span class="o">&gt;</span> bundle <span class="nb">exec </span>rake <span class="nt">-rwebrick</span> <span class="nt">-e</span> <span class="s2">"WEBrick::HTTPServer.new(Port: 8000, DocumentRoot: '.').start"</span>
+bundler: failed to load <span class="nb">command</span>: rake
+<span class="o">(</span>/tmp/rake/vendor/bundle/ruby/2.3.0/bin/rake<span class="o">)</span>
+NoMethodError: undefined method <span class="sb">`</span>activate_bin_path<span class="s1">' for Gem:Module
+  /tmp/rake/vendor/bundle/ruby/2.3.0/bin/rake:22:in `&lt;top (required)&gt;'</span>
+
+</code></pre></div> <p>Woupsy, the app won't start. What could possibly go wrong? I have packaged my app inside Docker it should just work!</p> <p>Let's check the rubygems versions both on my machine and in the container:</p> <div class=highlight><pre class="highlight shell"><code><span class="o">&gt;</span> gem <span class="nt">--version</span>
+2.5.1
+
+<span class="o">&gt;</span> docker run  <span class="nt">--entrypoint</span><span class="o">=</span><span class="s2">"gem"</span> rake <span class="nt">--version</span>
+2.6.7
+</code></pre></div> <p>Well in my case I was lucky enough to find <a href="https://github.com/rubygems/rubygems/commit/13afe08ec7dfcbbc09e7d76aedb476c0694c05fd">a change</a> in the way binstubs were generated by the latest <code>rubygems</code> codebase. So I tried to downgrade the version of the <code>rubygems</code> gem inside the container. A better way would obviously be to upgrade this gem on all the target machines but I wanted to share with you the possibility to change your <code>rubygems</code> version inside the base <code>ruby</code> Docker image.</p> <div class=highlight><pre class="highlight docker"><code><span class="k">ENV</span><span class="s"> RUBYGEMS_VERSION 2.5.1</span>
+<span class="k">RUN </span><span class="nb">echo</span> <span class="si">$(</span>gem which bundler<span class="si">)</span> | <span class="o">(</span><span class="nb">read </span>r<span class="p">;</span> <span class="nb">echo</span> <span class="k">${</span><span class="nv">r</span><span class="p">%gems*</span><span class="k">}</span><span class="o">)</span> | xargs gem uninstall bundler <span class="nt">-i</span>
+<span class="k">RUN </span>gem update <span class="nt">--system</span> <span class="nv">$RUBYGEMS_VERSION</span>
+<span class="k">RUN </span>gem <span class="nb">install </span>bundler
+</code></pre></div> <p>The final container that would be able to build, test and package my ruby app is thus the following.</p> <div class=highlight><pre class="highlight docker"><code><span class="c"># Dockerfile</span>
+<span class="c"># --</span>
+<span class="c">#</span>
+<span class="c"># Debian 8 Jessie base image (https://github.com/docker-library/ruby/blob/master/2.3/Dockerfile#L1)</span>
+<span class="k">FROM</span><span class="s"> ruby:2.3</span>
+
+<span class="k">WORKDIR</span><span class="s"> /app</span>
+<span class="c"># Make sure bundle config is kept in workdir</span>
+<span class="k">ENV</span><span class="s"> BUNDLE_APP_CONFIG /app/.bundle/</span>
+<span class="c"># Downgrade rubygems version</span>
+<span class="k">ENV</span><span class="s"> RUBYGEMS_VERSION 2.5.1</span>
+<span class="k">RUN </span><span class="nb">echo</span> <span class="si">$(</span>gem which bundler<span class="si">)</span> | <span class="o">(</span><span class="nb">read </span>r<span class="p">;</span> <span class="nb">echo</span> <span class="k">${</span><span class="nv">r</span><span class="p">%gems*</span><span class="k">}</span><span class="o">)</span> | xargs gem uninstall bundler <span class="nt">-i</span>
+<span class="k">RUN </span>gem update <span class="nt">--system</span> <span class="nv">$RUBYGEMS_VERSION</span>
+<span class="k">RUN </span>gem <span class="nb">install </span>bundler
+
+<span class="c"># Our app</span>
+<span class="k">RUN </span>bundle init
+<span class="k">RUN </span><span class="nb">echo</span> <span class="s2">"gem 'rake'"</span> <span class="o">&gt;&gt;</span> Gemfile
+<span class="k">RUN </span>bundle
+<span class="k">RUN </span>bundle <span class="nt">--deployment</span>
+
+<span class="c"># How to run the app</span>
+<span class="k">ENTRYPOINT</span><span class="s"> ["bundle", "exec", "rake"]</span>
+</code></pre></div> </article> <div id=disqus_thread></div> <script>
+//<![CDATA[
+                  var disqus_shortname = 'paul-bonaud-fr';
+          
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+//]]>
+</script> <noscript>Please enable JavaScript to view the <a href='http://disqus.com/?ref_noscript'>comments powered by Disqus.</a></noscript> <a href='http://disqus.com' class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a> <script>
+//<![CDATA[
+    var disqus_shortname = 'paul-bonaud-fr';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+//]]>
+</script> <div id=footer> <p></p> <div class=loader> <div id=wave class=send-placeholder> 👋 🐻 👋 </div> <a href="https://gitlab.com/paulrbr/paulrbr.gitlab.io/builds" target=_blank> <div class=send> <div class=send-indicator> <div class=send-indicator-dot></div> <div class=send-indicator-dot></div> <div class=send-indicator-dot></div> <div class=send-indicator-dot></div> </div> <button class=send-button> <div class=sent-bg></div> <i class="fa fa-check sent-icon"></i> </button> </div> </a> </div> <div class=legal> This site's source code is under <a href="https://gitlab.com/paulrbr/paulrbr.gitlab.io/blob/master/LICENSE" rel="AGPL License">AGPL</a> license and available on <a href="https://gitlab.com/paulrbr/paulrbr.gitlab.io">Gitlab</a> or <a href="https://github.com/paulRbr/paulrbr.gitlab.io">Github</a>. </div> </div> </body> </html>

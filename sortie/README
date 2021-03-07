@@ -1,0 +1,15 @@
+<h1 id="httpspaulrbriosortiehttpspaulrbriosortie"><a href="https://paulrbr.io/sortie">https://paulrbr.io/sortie</a></h1>
+
+<p><em>Fork de https://github.com/vikbez/covid-sortie (disponible sur https://vik.io/sortie)</em></p>
+
+<p>Un formulaire en ligne pour simplifier l'attestation de sortie pendant le confinement.</p>
+
+<p>J'ai fait ceci dans le but de m'aider moi meme et mes amis, mais vu que vous êtes tous chez vous aujourd'hui ça a forcément dégénéré et vous avez surchargé mon serveur :D</p>
+
+<p>Si vous avez des doutes pour vos données; vous pouvez demander à un ami développeur son avis (pas de suspense, il vous dira que tout est ok).</p>
+
+<p>La page n'envoie aucune info nulle part. Toutes les infos restent dans votre navigateur, l'attestation est générée directement dans celui ci et non sur un serveur distant. (0 cloud !)</p>
+
+<h1 id="soyez-prudents">Soyez prudents</h1>
+
+<p>Restez au maximum chez vous, suivez les infos mises a jour sur <a href="https://www.gouvernement.fr/info-coronavirus">le site du gouvernement</a>.</p>

@@ -1,0 +1,5 @@
+User-agent: *
+
+Disallow: /cv.pdf
+
+Sitemap: https://paulrbr.io/sitemap.xml
