@@ -1,7 +1,7 @@
 ---
 title: Adding Fun to the Configuration Burden
 date: 2020-05-26
-tags: configuration, infrastructure, deployments
+tags: configuration, infrastructure, deployment, dhall
 ---
 
 _This blogpost was originally posted on the [Fretlink Tech blog](https://tech.fretlink.com/adding-fun-to-the-configuration-burden/) while I was working there in 2020_
@@ -10,6 +10,8 @@ Did you ever enjoy writing `XML` files by hand? *No*, OK, I thought so. Was it b
 The reason for all these *no* is simple: **formats** are meant to be read or written by machines and not by humans.
 
 As computing folks we most probably prefer to write **code** because programming is what gives us the control over machines' behaviour. Follow me into the fabulous world of [programmable configuration files](https://github.com/dhall-lang/dhall-lang/wiki/Programmable-configuration-files). I'm pretty sure your will like it.
+
+READMORE
 
 ## Let's Rewrite our Deployment Configuration
 
