@@ -60,20 +60,6 @@ activate :blog do |b|
   b.paginate = true
 end
 
-###
-# Search
-###
-
-activate :search do |search|
-  search.resources = ["blog/"]
-  search.fields = {
-    title: {boost: 100, store: true, required: true},
-    content: {boost: 50},
-    url: {index: false, store: true},
-    author: {boost: 30},
-  }
-end
-
 set :css_dir, "stylesheets"
 set :js_dir, "javascripts"
 set :images_dir, "images"

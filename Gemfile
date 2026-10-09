@@ -1,16 +1,15 @@
 # If you do not have OpenSSL installed, update
 # the following line to use "http://" instead
-source "https://rubygems.org"
+source "https://gem.coop"
 
 gem "middleman"
 # Bring back sprockets to Middleman
-gem "middleman-sprockets", "~> 4.0.0.rc.1"
+gem "middleman-sprockets"
 # Blogging extension
 gem "middleman-blog"
 gem "builder" # For Atom xml feed
 gem "nokogiri" # For xml/html processing
-# Client side search
-gem "middleman-search"
+gem "mini_racer"
 # Live-reloading plugin
 gem "middleman-livereload"
 # Font-awesome style
