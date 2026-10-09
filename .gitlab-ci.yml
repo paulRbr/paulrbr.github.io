@@ -13,7 +13,8 @@ cache:
     - apt-get install -y nodejs
     - gem install bundler
     - bundle update --bundler
-    - bundle install --deployment
+    - bundle config set deployment true
+    - bundle install
 
 test: &test
   <<: *prepare

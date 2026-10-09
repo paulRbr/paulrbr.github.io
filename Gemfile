@@ -9,7 +9,6 @@ gem "middleman-sprockets"
 gem "middleman-blog"
 gem "builder" # For Atom xml feed
 gem "nokogiri" # For xml/html processing
-gem "mini_racer"
 # Live-reloading plugin
 gem "middleman-livereload"
 # Font-awesome style
